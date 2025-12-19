@@ -187,6 +187,5 @@ Cada hoja cumple una función específica dentro del flujo del sistema.
 ## Flujo del Sistema
 
 ![Arquitectura del sistema](docs/UNDTPST.svg)
-
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/practicantetransfdigital/Unificacion-Data-Pastas)
 
