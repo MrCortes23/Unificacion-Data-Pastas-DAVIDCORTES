@@ -91,7 +91,7 @@ La aplicación está diseñada bajo una **arquitectura de tres capas**, aprovech
 │ └── Vistas de consulta
 │
 ├── appsscript.json
-│ └── Configuración del proyecto Apps Script
+│ └── Configuración del proyecto de Apps Script
 │
 ├── assets/
 │ └── Recursos estáticos
@@ -180,6 +180,10 @@ Cada hoja cumple una función específica dentro del flujo del sistema.
 - Cuenta de Google Workspace
 - Acceso a Google Apps Script
 - Permisos sobre Google Sheets y Google Drive
+
+---
+
+## Flujo del Sistema
 
 ![Arquitectura del sistema](docs/UNDTPST.svg)
 
