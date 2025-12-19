@@ -80,24 +80,25 @@ La aplicación está diseñada bajo una **arquitectura de tres capas**, aprovech
 
 /
 ├── Code.js
-│ ├── Funciones backend
-│ ├── Lógica de negocio
-│ ├── Gestión de Sheets y Drive
-│ └── Envío de correos
+│   ├── Funciones backend
+│   ├── Lógica de negocio
+│   ├── Gestión de Sheets y Drive
+│   └── Envío de correos
 │
 ├── index.html
-│ ├── Interfaz principal
-│ ├── Formularios de reporte
-│ └── Vistas de consulta
+│   ├── Interfaz principal
+│   ├── Formularios de reporte
+│   └── Vistas de consulta
 │
 ├── appsscript.json
-│ └── Configuración del proyecto de Apps Script
+│   └── Configuración del proyecto de Apps Script
 │
 ├── assets/
-│ └── Recursos estáticos
+│   └── Recursos estáticos
 │
 └── README.md
-└── Documentación del proyecto
+    └── Documentación del proyecto
+
 
 
 ---
