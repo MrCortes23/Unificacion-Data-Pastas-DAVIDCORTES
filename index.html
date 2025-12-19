@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema de Reportes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <?!= include('Styles'); ?>
+</head>
+
+<body>
+    <div id="loginScreen" class="login-screen">
+        <div class="cards-wrapper">
+            <!-- Tarjeta de Registro (se desliza hacia la izquierda) -->
+            <div class="register-container" id="registerContainer">
+                <h1 class="register-title">REGISTRO</h1>
+                <p class="register-subtitle">Complete sus datos para registrarse</p>
+
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="register-form-grid">
+                        <div class="login-form-group">
+                            <label class="login-label">NOMBRES</label>
+                            <input
+                            type="text"
+                            id="regNombres"
+                            class="login-input"
+                            placeholder="Ingrese sus nombres"
+                            required
+                            autocomplete="off"
+                        >
+                        </div>
+
+                        <div class="login-form-group">
+                            <label class="login-label">APELLIDOS</label>
+                            <input
+                            type="text"
+                            id="regApellidos"
+                            class="login-input"
+                            placeholder="Ingrese sus apellidos"
+                            required
+                            autocomplete="off"
+                        >
+                        </div>
+
+                        <div class="login-form-group">
+                            <label class="login-label">CEDULA</label>
+                            <input
+                            type="text"
+                            id="regCedula"
+                            class="login-input"
+                            placeholder="Ingrese su cedula"
+                            required
+                            autocomplete="off"
+                        >
+                        </div>
+
+                        <div class="login-form-group">
+                            <label class="login-label">CORREO</label>
+                            <input
+                            type="email"
+                            id="regCorreo"
+                            class="login-input"
+                            placeholder="correo@ejemplo.com"
+                            required
+                            autocomplete="off"
+                        >
+                        </div>
+
+                        <div class="login-form-group">
+                            <label class="login-label">PROCESO</label>
+                            <select class="login-input" id="regProceso" required style="cursor: pointer;">
+                            <option value="">Seleccione proceso</option>
+                            <option value="Empaque">Empaque</option>
+                            <option value="Pastificio">Pastificio</option>
+                            <option value="Molino">Molino</option>
+                            <option value="CEDI">CEDI</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Almacenes">Almacenes Gral. y MP</option>
+                            <option value="Calidad">Calidad</option>
+                            <option value="Administracion">Administracion</option>
+                        </select>
+                        </div>
+
+                        <div class="login-form-group">
+                            <label class="login-label">EMPRESA</label>
+                            <select class="login-input" id="regEmpresa" required style="cursor: pointer;">
+                            <option value="">Seleccione empresa</option>
+                            <option value="DORIA">DORIA</option>
+                            <option value="Contratista">Contratista</option>
+                            <option value="Temporal">Temporal</option>
+                        </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="register-btn" id="registerBtn">
+                    <span id="registerBtnText">Registrarse</span>
+                    <span id="registerBtnSpinner" class="login-spinner" style="display: none;"></span>
+                </button>
+
+                    <button type="button" class="back-to-login-btn" onclick="toggleRegisterForm()">
+                    ← Volver al inicio de sesion
+                </button>
+
+                    <div id="registerError" class="register-error" style="display: none;"></div>
+                    <div id="registerSuccess" class="register-success" style="display: none;"></div>
+                </form>
+            </div>
+
+            <!-- Tarjeta de Login (se mantiene y se desplaza) -->
+            <div class="login-container">
+                <div class="login-logo">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvdptdCHB1bOarb5mxM-jRVL2XWq6FdYKUcA&s" alt="DORIA">
+                </div>
+                <h1 class="login-title">Reportes PASTAS</h1>
+                <p class="login-subtitle">Ingrese su cedula para continuar</p>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="login-form-group">
+                        <label class="login-label">CEDULA</label>
+                        <input
+                        type="text"
+                        id="cedulaInput"
+                        class="login-input"
+                        placeholder="Ingrese su cedula"
+                        required
+                        autocomplete="off"
+                    >
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                    <span id="loginBtnText"><i class="fa-solid fa-door-open"></i>   Ingresar</span>
+                    <span id="loginBtnSpinner" class="login-spinner" style="display: none;"></span>
+                </button>
+
+                    <div id="loginError" class="login-error" style="display: none;"></div>
+
+                    <button type="button" class="toggle-register-btn" onclick="toggleRegisterForm()">
+                    ¿Tu cédula no se encuentra? Pulsa aquí
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer" style="display: none;">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvdptdCHB1bOarb5mxM-jRVL2XWq6FdYKUcA&s" alt="DORIA">
+                </div>
+
+                <nav class="nav-tabs">
+                    <!-- <CHANGE> Dropdown clickeable para Reportes -->
+                    <div class="nav-dropdown" id="reportesDropdownContainer">
+                        <button class="nav-tab" id="reportesDropdownToggle" onclick="toggleReportesDropdown(event)"><i class="fa-solid fa-book-bookmark"></i> REPORTES</button>
+                        <div class="dropdown-menu" id="reportesDropdown" style="display: none;">
+                            <button class="dropdown-item" onclick="showPage('realizar-reporte'); hideReportesDropdown()">Realizar Reporte</button>
+                            <button class="dropdown-item" onclick="showPage('consolidado'); hideReportesDropdown()">Consolidado</button>
+                        </div>
+                    </div>
+
+                    <div class="nav-dropdown" id="gestionDropdownContainer">
+                        <button class="nav-tab" id="gestionDropdownToggle" onclick="toggleGestionDropdown(event)"><i class="fa-solid fa-folder-open"></i> GESTIÓN DE REPORTES</button>
+                        <div class="dropdown-menu" id="gestionDropdown" style="display: none;">
+                            <button class="dropdown-item" onclick="showPage('tarjetas'); hideGestionDropdown()">Tarjetas de Anormalidades</button>
+                            <button class="dropdown-item" onclick="showPage('n2'); hideGestionDropdown()">Reportes N2</button>
+                            <button class="dropdown-item" onclick="showPage('anormalidades'); hideGestionDropdown()">Anormalidades críticas por máquina</button>
+                            <button class="dropdown-item" onclick="showPage('ciclos'); hideGestionDropdown()">Ciclos de Mejora</button>
+                        </div>
+                    </div>
+                </nav>
+
+                <div class="user-info">
+                    <i class="fa-regular fa-user" style="color: #ffffff;"></i><span class="user-name" id="userName">Usuario</span>
+                </div>
+
+                <button class="logout-btn" onclick="handleLogout()" title="Cerrar sesión">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div id="realizar-reporte" class="page active">
+                <div class="content-grid">
+                    <div class="sidebar">
+                        <h2>REGISTRE SU REPORTE</h2>
+                        <p>Elija el tipo de reporte que va a realizar</p>
+
+                        <div class="report-buttons">
+                            <button class="report-btn" onclick="showReportForm('tarjeta', event)">Reporte de Anormalidades (Tarjetas)</button>
+                            <button class="report-btn active" onclick="showReportForm('n2', event)">Reportes para la N2 </button>
+                            <button class="report-btn" onclick="showReportForm('maquinas', event)">Novedades de Máquina (Mtto)</button>
+                            <button class="report-btn" onclick="showReportForm('ciclo', event)">Ciclo de Mejora</button>
+                        </div>
+                    </div>
+
+                    <div class="form-container">
+                        <div id="form-n2" class="report-form active">
+                            <form id="n2Form" onsubmit="submitN2Form(event)">
+                                <h1 style="
+                                    padding: 0 0 25px;
+                                    TEXT-ALIGN: -WEBKIT-CENTER;
+                                color: #475569;
+                                "> Formulario de Reportes N2 </h1>
+                                <hr
+                                    style="border: none;height: 2px;background-color: #e2e8f0;margin: 5px 0px 35px 0px;">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">PROCESO</label>
+                                        <select class="form-select" id="proceso" required>
+                                        <option value="">Selecciona el proceso</option>
+                                        <option value="Empaque">Empaque</option>
+                                        <option value="Pastificio">Pastificio</option>
+                                        <option value="Molino">Molino</option>
+                                        <option value="CEDI">CEDI</option>
+                                        <option value="Mantenimiento">Mantenimiento</option>
+                                        <option value="Almacenes">Almacenes Gral. y MP</option>
+                                      </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">LÍDER RESPONSABLE</label>
+                                        <div class="search-container">
+                                            <input type="text"
+                                      class="search-input"
+                                      id="liderSearch"
+                                      placeholder="Buscar por cédula o nombre..."
+                                      autocomplete="off"
+                                      oninput="searchLeaders(this.value)"
+                                      onfocus="showSearchResults()"
+                                      required>
+                                            <div class="search-results" id="searchResults"></div>
+                                            <input type="hidden" id="selectedLeaderCedula" name="liderResponsable">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">ZONA DEL PROCESO</label>
+                                        <select class="form-select" id="zonaProceso" name="zonaProceso">
+                                              <option value="">Selecciona la zona</option>
+                                          </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">OTRO (En caso de que no este en las opciones anteriores)</label>
+                                        <input type="text" class="form-input" id="otroProceso" name="zonaProceso" placeholder="Especificar otro...">
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label class="form-label">ANORMALIDAD</label>
+                                    <textarea class="form-textarea" id="anormalidad" placeholder="Anormalidad..." required></textarea>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">PROCESO RESPONSABLE</label>
+                                        <select class="form-select" id="procesoResponsable" required>
+                                            <option value="">Proceso responsable</option>
+                                            <option value="Seguridad y Salud en el trabajo">Seguridad y Salud en el trabajo</option>
+                                            <option value="Eléctricos">Eléctricos</option>
+                                            <option value="Calidad">Calidad</option>
+                                            <option value="Excelencia Operacional">Excelencia Operacional</option>
+                                            <option value="Ambiental">Ambiental</option>
+                                            <option value="Gestión Humana">Gestión Humana</option>
+                                            <option value="Planeación">Planeación</option>
+                                            <option value="Servicio Técnico">Servicio Técnico</option>
+                                            <option value="Mecanicos">Mecanicos</option>
+                                            <option value="Autonomo">Autónomo</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">FECHA PREVISTA PARA LA SOLUCIÓN</label>
+                                        <input type="date" class="form-input" id="fechaSolucion" required>
+                                    </div>
+                                </div>
+                                <hr
+                                    style="border: none;height: 2px;background-color: #e2e8f0;margin: 35px 0px 35px 0px;">
+                                <!-- En tu formulario N2, agrega esta sección -->
+                                <div class="form-group">
+                                    <label form="fileInputN2" label class="form-label">Imágenes del reporte N2 (opcional)</label>
+                                    <div id="dropZoneN2" class="drop-zone">
+                                        <p>Arrastra tus imágenes aquí o haz clic para seleccionarlas</p>
+                                    </div>
+                                    <input type="file" id="fileInputN2" multiple accept="image/*" style="display:none;">
+                                    <div id="previewContainerN2" class="preview-container"></div>
+                                </div>
+
+                                <button type="submit" class="submit-btn">Enviar Reporte</button>
+                            </form>
+                        </div>
+
+                        <div id="form-tarjeta" class="report-form" style="display: none;">
+                            <form id="tarjetaForm" onsubmit="submitTarjetaForm(event)">
+                                <h1 style="
+                                    padding: 0 0 25px;
+                                    TEXT-ALIGN: -WEBKIT-CENTER;
+                                color: #475569;
+                                "> Formulario de Tarjetas de Anormalidades </h1>
+                                <hr
+                                    style="border: none;height: 2px;background-color: #e2e8f0;margin: 5px 0px 35px 0px;">
+                                <div id="form-tarjeta-header" class="form-header-notice">
+                                    <div class="notice-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z"
+                                                fill="#3B82F6" />
+                                            <path
+                                                d="M12 17C11.45 17 11 16.55 11 16V12C11 11.45 11.45 11 12 11C12.55 11 13 11.45 13 12V16C13 16.55 12.55 17 12 17Z"
+                                                fill="white" />
+                                            <path
+                                                d="M12 8C11.45 8 11 7.55 11 7C11 6.45 11.45 6 12 6C12.55 6 13 6.45 13 7C13 7.55 12.55 8 12 8Z"
+                                                fill="white" />
+                                        </svg>
+                                    </div>
+                                    <div class="notice-content">
+                                        <h3 class="notice-title">¡Revisa antes de Enviar!</h3>
+                                        <p class="notice-description">
+                                            Para evitar reportes duplicados, verifique en el consolidado que la tarjeta
+                                            de anormalidad
+                                            no haya sido registrada previamente.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">ZONA DE RIESGO</label>
+                                        <select class="form-select" id="zonaRiesgo" required>
+                                            <option value="">Selecciona la zona de riesgo</option>
+                                            <option value="Logística - Materias Primas">Logística - Materias Primas</option>
+                                            <option value="Logistica - Almacen General">Logistica - Almacen General</option>
+                                            <option value="Manufactura - Molino">Manufactura - Molino</option>
+                                            <option value="Manufactura - Pastificio A">Manufactura - Pastificio A</option>
+                                            <option value="Manufactura - Pastificio B">Manufactura - Pastificio B</option>
+                                            <option value="Manufactura - Pastificio C">Manufactura - Pastificio C</option>
+                                            <option value="Manufactura - Pastificio D">Manufactura - Pastificio D</option>
+                                            <option value="Manufactura - Pastificio Lavamoldes">Manufactura - Lavamoldes</option>
+                                            <option value="Manufactura - Empaque Pasta Larga">Manufactura - Empaque Pasta Larga</option>
+                                            <option value="Manufactura - Empaque MQ 02">Manufactura - Empaque MQ 02</option>
+                                            <option value="Manufactura - Empaque MQ 03">Manufactura - Empaque MQ 03</option>
+                                            <option value="Manufactura - Empaque MQ 04">Manufactura - Empaque MQ 04</option>
+                                            <option value="Manufactura - Empaque MQ 05">Manufactura - Empaque MQ 05</option>
+                                            <option value="Manufactura - Empaque MQ 06">Manufactura - Empaque MQ 06</option>
+                                            <option value="Manufactura - Empaque Encartonadora PL">Manufactura - Empaque Encartonadora PL</option>
+                                            <option value="Manufactura - Empaque MQ 17">Manufactura - Empaque MQ 17</option>
+                                            <option value="Manufactura - Empaque MQ 18">Manufactura - Empaque MQ 18</option>
+                                            <option value="Manufactura - Empaque MQ 19">Manufactura - Empaque MQ 19</option>
+                                            <option value="Manufactura - Empaque MQ 20">Manufactura - Empaque MQ 20</option>
+                                            <option value="Manufactura - Empaque MQ 21">Manufactura - Empaque MQ 21</option>
+                                            <option value="Manufactura - Empaque Encartonadora PC">Manufactura -Empaque Encartonadora PC</option>
+                                            <option value="Manufactura - Empaque Linea Vaso">Manufactura - Empaque Linea Vaso</option>
+                                            <option value="Edificio Información Manufactura">Edificio Información Manufactura</option>
+                                            <option value="Manufactura - Empaque Celdas Robóticas">Manufactura - Empaque Celdas Robóticas</option>
+                                            <option value="Ingenieria y Montajes">Ingenieria y Montajes</option>
+                                            <option value="Servicios Tecnicos">Servicios Tecnicos</option>
+                                            <option value="Metrología">Metrología</option>
+                                            <option value="SDM">SDM</option>
+                                            <option value="Empaques especiales">Empaques especiales (CEMPA)</option>
+                                            <option value="Logistica CEDI A">Logistica CEDI A</option>
+                                            <option value="Logistica CEDI B">Logistica CEDI B</option>
+                                            <option value="Laboratorio I+D">Laboratorio I+D</option>
+                                            <option value="Edificio Administrativo">Edificio Administrativo</option>
+                                            <option value="Lockers vinculados Edificio Administrativo">Lockers vinculados Edificio Administrativo</option>
+                                            <option value="Exteriores">Exteriores</option>
+                                            <option value="Plantas de tratamiento de aguas Residuales">Plantas de tratamiento de aguas Residuales (PTAR)</option>
+                                            <option value="Plantas de tratamiento de agua Potable">Plantas de tratamiento de agua Potable (PTAP)</option>
+                                            <option value="Bodega de excedentes industriales">Bodega de excedentes industriales</option>
+                                            <option value="Zonas de contratistas">Zonas de contratistas</option>
+                                            <option value="Portería">Portería</option>
+                                            <option value="Casino">Casino</option>
+                                            <option value="Cuarto de Baterías">Cuarto de Baterías</option>
+                                            <option value="Cuarto Venta de Empleados">Cuarto Venta de Empleados</option>
+                                            <option value="Taller de Mantenimientos">Taller de Mantenimientos</option>
+
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">NOMBRE Y CÉDULA</label>
+                                        <input type="text" class="form-input" id="nombreCedula" placeholder="Nombre completo y cédula" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">UBICACIÓN 
+                                        Título de la tarjeta (Incluye la zona y la anormalidad identificada)
+                                        </label>
+                                        <input
+                                    type="text" class="form-input" id="ubicacion" maxlength="36" oninput="validarLongitudUbicacion(this)" placeholder='Ejem: Maquina A con Fuga de Líquidos' required>
+                                        <div id="contador-ubicacion" class="char-counter"
+                                            style="font-size: 12px; color: #64748b; text-align: right; margin-top: 2px;">
+                                            0/36
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">PRIORIDAD <br></label>
+                                        <select class="form-select" id="prioridad" required>
+                                            <option value="">Selecciona la prioridad</option>
+                                            <option value="Alta">Alta (2 Dias)</option>
+                                            <option value="Media">Media (15 Dias)</option>
+                                            <option value="Baja">Baja (30 Dias)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label class="form-label">DESCRIPCIÓN DEL PROBLEMA</label>
+                                    <textarea class="form-textarea" id="descripcionProblema" placeholder="Describa detalladamente el problema..." required></textarea>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">¿Qué tipo de riesgo se puede materializar con el problema que estás reportando?</label>
+                                        <select class="form-select" id="tipoRiesgo" required>
+                                            <option value="">Selecciona el tipo de riesgo</option>
+                                            <option value="Riesgo a las personas">Riesgo a las personas</option>
+                                            <option value="Riesgo ambiental">Riesgo ambiental</option>
+                                            <option value="Riesgo de inocuidad">Riesgo de inocuidad</option>
+                                            <option value="Riesgo de falla de equipo">Riesgo de falla de equipo</option>
+                                            <option value="Riesgo de calidad">Riesgo de calidad</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">PROBLEMA ASOCIADO</label>
+                                        <select class="form-select" id="problemaAsociado" required>
+                                              <option value="">Selecciona un problema</option>
+                                            </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">SISTEMA DE GESTIÓN</label>
+                                        <select class="form-select" id="sistemaGestion">
+                                              <option value="">Selecciona el sistema</option>
+                                            </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Selecciona al responsable de dar solución a tu reporte</label>
+                                        <select class="form-select" id="responsableSolucion" required>
+                                            <option value="">Selecciona</option>
+                                            <option value="Jefe del Area Seleccionada">Jefe del Area Seleccionada</option>
+                                            <option value="Jefe Aseguramiento de Calidad">Jefe Aseguramiento de Calidad</option>
+                                            <option value="Coordinador de Gestión Ambiental">Coordinador de Gestión Ambiental</option>
+                                            <option value="Equipo SST">Equipo SST</option>
+                                            <option value="Obras Civiles">Obras Civiles</option>
+                                            <option value="Reparaciones Metalmecanicas IMB">Reparaciones Metalmecanicas IMB</option>
+                                            <option value="Técnico Eléctrico">Técnico Eléctrico</option>
+                                            <option value="Técnico Mecánico">Técnico Mecánico</option>
+                                            <option value="Coordinador de Proyectos">Coordinador de Proyectos</option>
+                                            <option value="Servicios Técnicos">Servicios Técnicos</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">¿Esta tarjeta fue generada por? (Opcional)</label>
+                                        <select class="form-select" id="generadaPor">
+                                            <option value="">Selecciona</option>
+                                            <option value="Parada autónoma">Parada autónoma</option>
+                                            <option value="Caminata cuidado por la vida">Caminata cuidado por la vida</option>
+                                            <option value="Tour Terreno">Tour Terreno</option>
+                                            <option value="Control de Proceso">Control de Proceso</option>
+                                            <option value="Actividades de COPASST">Actividades de COPASST</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Fecha de creación de la tarjeta</label>
+                                        <input type="text" class="form-input" id="fechaCreacionTarjeta" name="fechaCreacionTarjeta" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">¿Requiere subir esta tarjeta a SAP?</label>
+                                        <select class="form-select" id="requiereSAP" required>
+                    <option value="">Selecciona sí o no</option>
+                    <option value="Si">Sí</option>
+                    <option value="No">No</option>
+                </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-header-notice"
+                                            style="margin-top: 0; background: #fff3cd; border-left-color: #ffc107;">
+                                            <div class="notice-icon" style="background: rgba(245, 158, 11, 0.1);">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z"
+                                                        fill="#f59e0b" />
+                                                    <path
+                                                        d="M12 17C11.45 17 11 16.55 11 16V12C11 11.45 11.45 11 12 11C12.55 11 13 11.45 13 12V16C13 16.55 12.55 17 12 17Z"
+                                                        fill="white" />
+                                                    <path
+                                                        d="M12 8C11.45 8 11 7.55 11 7C11 6.45 11.45 6 12 6C12.55 6 13 6.45 13 7C13 7.55 12.55 8 12 8Z"
+                                                        fill="white" />
+                                                </svg>
+                                            </div>
+                                            <div class="notice-content">
+                                                <h4 class="notice-title"
+                                                    style="font-size: 14px; color: #8a5a00; margin-bottom: 4px;">
+                                                    Indicaciones SAP</h4>
+                                                <p class="notice-description"
+                                                    style="font-size: 13px; color: #8a5a00; margin: 0;">
+                                                    Seleccione <strong>Sí</strong> solo si la anormalidad necesita:<br>
+                            • Mano de obra de Mantenimiento<br>
+                            • Mano de obra de un contratista para gestione mantenimiento<br>
+                            • Solicitud de repuesto<br><br>
+                            Si no requiere intervención de Mantenimiento, seleccione <strong>No</strong>.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr
+                                    style="border: none;height: 2px;background-color: #e2e8f0;margin: 35px 0px 35px 0px;">
+                                <div class="form-group full-width">
+                                    <label class="form-label">Agrega una o varias fotos (opcional)</label>
+
+                                    <div id="dropZone" class="drop-zone">
+                                        <p>Arrastra tus imágenes aquí o haz clic para seleccionarlas</p>
+                                        <input type="file" id="fileInput" multiple accept="image/*" hidden>
+                                    </div>
+
+                                    <div id="previewContainer" class="preview-container"></div>
+                                </div>
+
+                                <button type="submit" class="submit-btn">Enviar Tarjeta</button>
+                            </form>
+                        </div>
+
+                        <!-- FORMULARIO CICLO DE MEJORA -->
+                        <!-- FORMULARIO CICLO DE MEJORA -->
+                        <div id="form-ciclo" class="report-form" style="display: none;">
+                            <form id="cicloForm" onsubmit="submitCicloForm(event)">
+                                <h1 style="padding: 0 0 25px; text-align: center; color: #475569;">Formulario de Ciclo
+                                    de Mejora</h1>
+                                <hr
+                                    style="border: none; height: 2px; background-color: #e2e8f0; margin: 5px 0px 35px 0px;">
+
+                                <!-- ========== SECCIÓN 1: DEFINIR Y MEDIR ========== -->
+                                <div class="ciclo-section">
+                                    <div class="section-header">
+                                        <h2 class="section-title">1. DEFINIR Y MEDIR</h2>
+                                        <p class="section-subtitle">Establecer la línea base, la meta, la brecha y el
+                                            impacto financiero del proyecto</p>
+                                    </div>
+
+                                    <div class="section-content">
+                                        <!-- CAMPOS BÁSICOS DEL CICLO -->
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">CICLO DE MEJORA N°</label>
+                                                <input type="text" class="form-input" id="cicloMejoraId" readonly placeholder="CM-001" style="background-color: #f1f5f9;">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label">FECHA</label>
+                                                <input type="text" class="form-input" id="fechaCiclo" readonly style="background-color: #f1f5f9;">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group full-width">
+                                            <label class="form-label">NOMBRE DEL CICLO DE MEJORA</label>
+                                            <input type="text" class="form-input" id="nombreCicloMejora" placeholder="Ingrese el nombre del ciclo de mejora" required style="margin-bottom: 1rem;">
+                                        </div>
+
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">NÚMERO AVISO DE MANTENIMIENTO (Opcional)</label>
+                                                <input type="text" class="form-input" id="avisoMantenimiento" placeholder="Número de aviso...">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label">PROCESO</label>
+                                                <select class="form-select" id="procesoCiclo" required>
+                            <option value="">Seleccione el proceso</option>
+                            <option value="Empaque">Empaque</option>
+                            <option value="Pastificio">Pastificio</option>
+                            <option value="Molino">Molino</option>
+                            <option value="CEDI">CEDI</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Almacenes">Almacenes Gral. y MP</option>
+                            <option value="Calidad">Calidad</option>
+                            <option value="Administracion">Administración</option>
+                        </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">EQUIPO / MÁQUINA</label>
+                                                <input type="text" class="form-input" id="equipoMaquina" placeholder="Nombre del equipo o máquina" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label">LÍDER</label>
+                                                <div class="search-container">
+                                                    <input type="text"
+                                class="search-input"
+                                id="liderCicloSearch"
+                                placeholder="Buscar por cédula o nombre..."
+                                autocomplete="off"
+                                oninput="searchLiderCiclo(this.value)"
+                                onfocus="showLiderCicloResults()"
+                                required>
+                                                    <div class="search-results" id="liderCicloResults"></div>
+                                                    <input type="hidden" id="liderCiclo" name="liderCiclo">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group full-width">
+                                            <label class="form-label">INTEGRANTES DEL ANÁLISIS</label>
+                                            <div class="multi-search-container">
+                                                <div class="selected-items" id="integrantesSeleccionados"></div>
+                                                <div class="search-container">
+                                                    <input type="text"
+                                class="search-input"
+                                id="integrantesSearch"
+                                placeholder="Buscar integrante por cédula o nombre..."
+                                autocomplete="off"
+                                oninput="searchIntegrantes(this.value)"
+                                onfocus="showIntegrantesResults()">
+                                                    <div class="search-results" id="integrantesResults"></div>
+                                                </div>
+                                                <input type="hidden" id="integrantesAnalisis" name="integrantesAnalisis">
+                                            </div>
+                                            <small class="form-hint">Seleccione uno o más integrantes del equipo de análisis</small>
+                                        </div>
+
+                                        <hr
+                                            style="border: none; height: 1px; background-color: #e2e8f0; margin: 25px 0;">
+
+                                        <!-- SELECTOR DE FOCO DE MEJORA -->
+                                        <div class="foco-mejora-container">
+                                            <label class="form-label foco-label">ELIGE TU FOCO DE MEJORA</label>
+                                            <div class="foco-options">
+                                                <label class="foco-option">
+                            <input type="radio" name="focoMejora" value="indicador" onchange="mostrarFocoMejora('indicador')">
+                            <span class="foco-option-content">
+                                <span class="foco-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                                <span class="foco-text">Mejorar un resultado (indicador)</span>
+                            </span>
+                        </label>
+                                                <label class="foco-option">
+                            <input type="radio" name="focoMejora" value="proceso" onchange="mostrarFocoMejora('proceso')">
+                            <span class="foco-option-content">
+                                <span class="foco-icon"><i class="fa-solid fa-gauge-high"></i></span>
+                                <span class="foco-text">Hacer que el proceso sea más rápido y fácil</span>
+                            </span>
+                        </label>
+                                                <label class="foco-option">
+                            <input type="radio" name="focoMejora" value="error" onchange="mostrarFocoMejora('error')">
+                            <span class="foco-option-content">
+                                <span class="foco-icon"><i class="fa-solid fa-ban"></i></span>
+                                <span class="foco-text">Evitar que un error vuelva a pasar</span>
+                            </span>
+                        </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- FOCO: MEJORAR INDICADOR -->
+                                        <div id="focoIndicador" class="foco-content" style="display: none;">
+                                            <div class="foco-subtitle">
+                                                <p>¿Buscas: Aumentar una meta o reducir un número malo? (Ahorrar dinero
+                                                    o Producir más)</p>
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Nombre del Indicador (KPI)</label>
+                                                    <input type="text" class="form-input" id="nombreKPI" placeholder="Ejemplo: OEE, Tasa de Defectos, % de Entregas a Tiempo">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">El Indicador Mejora Cuando</label>
+                                                    <select class="form-select" id="direccionIndicador">
+                                <option value="">Seleccione...</option>
+                                <option value="sube">Sube (Ej. OEE)</option>
+                                <option value="baja">Baja (Ej. Desperdicio)</option>
+                            </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Resultado Actual (Línea Base)</label>
+                                                    <input type="number" step="any" class="form-input" id="resultadoActual" placeholder="¿Cómo estamos hoy?" oninput="calcularBrechaIndicador()">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Meta que Queremos Alcanzar</label>
+                                                    <input type="number" step="any" class="form-input" id="metaIndicador" placeholder="¿A dónde queremos llegar?" oninput="calcularBrechaIndicador()">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group full-width">
+                                                <label class="form-label">La Brecha a Cerrar</label>
+                                                <input type="text" class="form-input brecha-calculada" id="brechaIndicador" readonly placeholder="Cálculo automático: Es la oportunidad de mejora" style="background-color: #fef3c7; font-weight: 600;">
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Ahorro Estimado en $</label>
+                                                    <input type="number" step="any" class="form-input" id="ahorroIndicadorDinero" placeholder="¿Cuánto dinero ahorraremos si alcanzamos la meta?">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Ahorro Estimado en %</label>
+                                                    <input type="number" step="any" class="form-input" id="ahorroIndicadorPorcentaje" placeholder="¿Qué porcentaje de mejora logramos?">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- FOCO: PROCESO MÁS RÁPIDO -->
+                                        <div id="focoProceso" class="foco-content" style="display: none;">
+                                            <div class="foco-subtitle">
+                                                <p>¿Buscas: Eliminar las esperas, los pasos innecesarios o el papeleo?
+                                                    (Mejorar el Flujo de Trabajo)</p>
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Proceso a Simplificar</label>
+                                                    <input type="text" class="form-input" id="procesoSimplificar" placeholder="Ejemplo: Proceso de facturación, armado de pedidos, cambio de formato">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Métrica de Flujo (Tiempo/Distancia)</label>
+                                                    <select class="form-select" id="metricaFlujo" onchange="toggleMetricaOtro()">
+                                <option value="">Seleccione...</option>
+                                <option value="Tiempo de Ciclo">Tiempo de Ciclo</option>
+                                <option value="Tiempo de Espera">Tiempo de Espera</option>
+                                <option value="Distancia Recorrida">Distancia Recorrida</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group full-width" id="metricaOtroContainer"
+                                                style="display: none;">
+                                                <label class="form-label">Especifique la Métrica</label>
+                                                <input type="text" class="form-input" id="metricaOtro" placeholder="Ingrese su métrica personalizada...">
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Tiempo/Valor Actual del Flujo</label>
+                                                    <input type="number" step="any" class="form-input" id="valorActualFlujo" placeholder="¿Cuánto tarda hoy el proceso de inicio a fin?" oninput="calcularReduccionFlujo()">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Meta de Tiempo/Valor</label>
+                                                    <input type="number" step="any" class="form-input" id="metaFlujo" placeholder="¿A qué tiempo queremos reducirlo?" oninput="calcularReduccionFlujo()">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group full-width">
+                                                <label class="form-label">La Reducción a Lograr</label>
+                                                <input type="text" class="form-input brecha-calculada" id="reduccionFlujo" readonly placeholder="Cálculo automático" style="background-color: #fef3c7; font-weight: 600;">
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Objetivo de Ahorro en Tiempo Total</label>
+                                                    <input type="text" class="form-input" id="ahorroTiempoTotal" placeholder="¿Cuántas horas en total se liberarán al mes para el equipo?">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Impacto Estimado en $</label>
+                                                    <input type="number" step="any" class="form-input" id="impactoProcesoDinero" placeholder="¿Cuánto valor tiene esa capacidad de tiempo liberada?">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- FOCO: EVITAR ERROR -->
+                                        <div id="focoError" class="foco-content" style="display: none;">
+                                            <div class="foco-subtitle">
+                                                <p>¿Buscas: Solucionar un problema grave de calidad o un hallazgo de
+                                                    auditoría? (Eliminar el Riesgo)</p>
+                                            </div>
+
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Declaración del Problema/Fallo</label>
+                                                <textarea class="form-textarea" id="declaracionProblema" placeholder="Describe la No Conformidad (Ej. Mezcla de lotes, Etiqueta incorrecta, Accidente)" style="min-height: 80px;"></textarea>
+                                            </div>
+
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Evidencia del Fallo</label>
+                                                <input type="text" class="form-input" id="evidenciaFallo" placeholder="¿Dónde y cuándo se detectó? (Ej. Hallazgo de Auditoría 202, Queja de Cliente X)" style="margin-bottom: 30px;">
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Frecuencia Actual (Recurrencia)</label>
+                                                    <input type="number" step="1" class="form-input" id="frecuenciaActual" placeholder="¿Cuántas veces ha pasado esto en los últimos 6 meses?" oninput="calcularBrechaRecurrencia()">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Meta de Frecuencia</label>
+                                                    <input type="number" step="1" class="form-input" id="metaFrecuencia" value="0" readonly style="background-color: #dcfce7; font-weight: 600;">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Brecha de Recurrencia</label>
+                                                <input type="text" class="form-input brecha-calculada" id="brechaRecurrencia" readonly placeholder="Cálculo automático: El número de veces que pasa hoy" style="background-color: #fef3c7; font-weight: 600;">
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="form-group">
+                                                    <label class="form-label">Objetivo de Reducción de Riesgo</label>
+                                                    <input type="text" class="form-input" id="objetivoReduccionRiesgo" placeholder="¿Qué riesgo eliminaremos? (Ej. Evitar un recall, multas, lesiones)">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Impacto Estimado en Costo (Indirecto)</label>
+                                                    <input type="number" step="any" class="form-input" id="impactoCostoIndirecto" placeholder="¿Cuánto nos costó el reproceso, investigación o posible multa?">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ========== SECCIÓN 2: ANALIZAR (ESTRUCTURA) ========== -->
+                                <div class="ciclo-section">
+                                    <div class="section-header">
+                                        <h2 class="section-title">2. ANALIZAR (Estructura)</h2>
+                                        <p class="section-subtitle">Identificar y clasificar todas las posibles
+                                            categorías de causas de la Desviación del Indicador</p>
+                                    </div>
+
+                                    <div class="section-content">
+                                        <!-- SECCIÓN ESPINA DE PESCADO -->
+                                        <div class="fishbone-section">
+                                            <div class="fishbone-header">
+                                                <h2 class="fishbone-title">ESPINA DE PESCADO</h2>
+                                                <p class="fishbone-subtitle">Diagrama de Análisis de Causa Raíz</p>
+                                            </div>
+
+                                            <!-- DEFECTO CENTRAL -->
+                                            <div class="defect-container">
+                                                <label class="form-label defect-label">DEFECTO / PROBLEMA PRINCIPAL</label>
+                                                <input type="text" class="form-input defect-input" id="defectoPrincipal" placeholder="Describa el defecto o problema principal a analizar..." required>
+                                            </div>
+
+                                            <!-- DIAGRAMA PROFESIONAL -->
+                                            <div class="fishbone-diagram-pro">
+                                                <!-- Fila Superior: Medio Ambiente, Mano de Obra, Materiales -->
+                                                <div class="fishbone-row-pro top-row">
+                                                    <div class="fishbone-branch top-branch" data-category="ambiente">
+                                                        <div class="branch-header ambiente-header">MEDIO AMBIENTE</div>
+                                                        <div class="branch-causes" id="causas-ambiente">
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="ambiente" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="ambiente" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="ambiente" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="add-cause-btn-pro" onclick="agregarCausa('ambiente')">+ Agregar</button>
+                                                    </div>
+
+                                                    <div class="fishbone-branch top-branch" data-category="mano">
+                                                        <div class="branch-header mano-header">MANO DE OBRA</div>
+                                                        <div class="branch-causes" id="causas-mano">
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="mano" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="mano" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="mano" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="add-cause-btn-pro" onclick="agregarCausa('mano')">+ Agregar</button>
+                                                    </div>
+
+                                                    <div class="fishbone-branch top-branch" data-category="materiales">
+                                                        <div class="branch-header materiales-header">MATERIALES</div>
+                                                        <div class="branch-causes" id="causas-materiales">
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="materiales" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="materiales" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="materiales" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="add-cause-btn-pro" onclick="agregarCausa('materiales')">+ Agregar</button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Línea Central (Espina Principal) -->
+                                                <div class="main-spine">
+                                                    <div class="spine-body"></div>
+                                                    <div class="spine-head">
+                                                        <div class="defect-box" id="defectBox">DEFECTO</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Fila Inferior: Tiempo, Método, Máquina -->
+                                                <div class="fishbone-row-pro bottom-row">
+                                                    <div class="fishbone-branch bottom-branch" data-category="tiempo">
+                                                        <button type="button" class="add-cause-btn-pro" onclick="agregarCausa('tiempo')">+ Agregar</button>
+                                                        <div class="branch-causes" id="causas-tiempo">
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="tiempo" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="tiempo" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="tiempo" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="branch-header tiempo-header">TIEMPO</div>
+                                                    </div>
+
+                                                    <div class="fishbone-branch bottom-branch" data-category="metodo">
+                                                        <button type="button" class="add-cause-btn-pro" onclick="agregarCausa('metodo')">+ Agregar</button>
+                                                        <div class="branch-causes" id="causas-metodo">
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="metodo" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="metodo" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="metodo" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="branch-header metodo-header">MÉTODO</div>
+                                                    </div>
+
+                                                    <div class="fishbone-branch bottom-branch" data-category="maquina">
+                                                        <button type="button" class="add-cause-btn-pro" onclick="agregarCausa('maquina')">+ Agregar</button>
+                                                        <div class="branch-causes" id="causas-maquina">
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="maquina" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="maquina" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                            <div class="cause-row">
+                                                                <input type="text" class="cause-input-pro" data-category="maquina" placeholder="Causa...">
+                                                                <button type="button" class="cause-remove-btn" onclick="eliminarCausa(this)">×</button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="branch-header maquina-header">MÁQUINA</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ========== SECCIÓN 3: ANALIZAR (PROFUNDIDAD) ========== -->
+                                <div class="ciclo-section">
+                                    <div class="section-header">
+                                        <h2 class="section-title">3. ANALIZAR (Profundidad)</h2>
+                                        <p class="section-subtitle">Determinar la verdadera Causa Raíz de las causas más
+                                            probables identificadas en la Espina de Pescado</p>
+                                    </div>
+
+                                    <div class="section-content">
+                                        <!-- PREGUNTA 5 POR QUÉ -->
+                                        <div class="cinco-porques-toggle">
+                                            <label class="form-label">¿DESEA REALIZAR EL ANÁLISIS 5 POR QUÉ?</label>
+                                            <div class="toggle-buttons">
+                                                <button type="button" class="toggle-btn" id="btnSiPorques" onclick="mostrar5Porques(true)">SÍ</button>
+                                                <button type="button" class="toggle-btn active" id="btnNoPorques" onclick="mostrar5Porques(false)">NO</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- SECCIÓN 5 POR QUÉ - TABLA PROFESIONAL -->
+                                        <div id="seccion5Porques" style="display: none;">
+                                            <div class="porques-section">
+                                                <div class="porques-header">
+                                                    <h3 class="porques-title">ANÁLISIS 5 POR QUÉ</h3>
+                                                    <p class="porques-subtitle">Las causas identificadas en la espina de
+                                                        pescado se mostrarán automáticamente</p>
+                                                </div>
+
+                                                <div class="porques-table-wrapper">
+                                                    <table class="porques-table" id="tabla5Porques">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="th-5ms">5 M's</th>
+                                                                <th class="th-causa">Causas Espina de Pescado</th>
+                                                                <th class="th-porque">Por Qué 1?</th>
+                                                                <th class="th-porque">Por Qué 2?</th>
+                                                                <th class="th-porque">Por Qué 3?</th>
+                                                                <th class="th-porque">Por Qué 4?</th>
+                                                                <th class="th-porque">Por Qué 5?</th>
+                                                                <th class="th-raiz">Causa Raíz</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="tbody5Porques">
+                                                            <tr class="empty-row">
+                                                                <td colspan="8" class="empty-message">
+                                                                    Complete las causas en el diagrama de Espina de
+                                                                    Pescado para generar el análisis
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- FIN SECCIÓN 3: ANALIZAR (Profundidad) -->
+
+                                <!-- ========== AQUÍ VA LA SECCIÓN 4 ========== -->
+
+                                <!-- SECCIÓN 4: MEJORAR Y CONTROLAR (Solo header) -->
+                                <div class="ciclo-section" style="margin-bottom: auto;">
+                                    <div class="section-header">
+                                        <h2 class="section-title">4. MEJORAR Y CONTROLAR</h2>
+                                        <p class="section-subtitle">Detallar la implementación de las soluciones para
+                                            eliminar la Causa Raíz</p>
+                                    </div>
+                                </div>
+
+                                <!-- TABLA PLAN DE ACCIÓN (separada del header) -->
+                                <div class="plan-accion-wrapper">
+                                    <div class="plan-accion-title-bar">
+                                        <h3 class="plan-accion-title">Plantilla 5W+2H (Plan de Acción)</h3>
+                                        <button type="button" class="btn-agregar-accion" onclick="agregarFilaAccion()">+ Agregar Acción</button>
+                                    </div>
+
+                                    <div class="plan-accion-table-wrapper">
+                                        <table class="plan-accion-table" id="tablaPlanAccion">
+                                            <thead>
+                                                <tr class="header-row-titles">
+                                                    <th class="th-cual">
+                                                        CUÁL
+                                                        <span class="tooltip-icon" data-tooltip="Causa Raíz traída de la Espina de Pescado o del análisis 5 Por Qué">?</span>
+                                                    </th>
+                                                    <th class="th-que">
+                                                        QUÉ
+                                                        <span class="tooltip-icon" data-tooltip="La solución específica que elimina la Causa Raíz">?</span>
+                                                    </th>
+                                                    <th class="th-donde">
+                                                        DÓNDE
+                                                        <span class="tooltip-icon" data-tooltip="Proceso, línea, máquina, área, etc. donde se aplicará">?</span>
+                                                    </th>
+                                                    <th class="th-quien">
+                                                        QUIÉN
+                                                        <span class="tooltip-icon" data-tooltip="El rol o persona responsable de la ejecución">?</span>
+                                                    </th>
+                                                    <th class="th-como">
+                                                        CÓMO
+                                                        <span class="tooltip-icon" data-tooltip="El detalle del procedimiento o método a seguir">?</span>
+                                                    </th>
+                                                    <th class="th-cuando">
+                                                        CUÁNDO
+                                                        <span class="tooltip-icon" data-tooltip="Plazo o fecha límite para asegurar la disciplina">?</span>
+                                                    </th>
+                                                    <th class="th-cuanto">
+                                                        CUÁNTO
+                                                        <span class="tooltip-icon" data-tooltip="Impacto financiero: inversión requerida o recursos necesarios">?</span>
+                                                    </th>
+                                                    <th class="th-acciones">Acciones</th>
+                                                </tr>
+                                                <tr class="header-row-subtitles">
+                                                    <td>Relación de la causa raíz encontrada</td>
+                                                    <td>Escribo la acción a realizar</td>
+                                                    <td>Escribo dónde voy a ejecutar la acción</td>
+                                                    <td>Enuncio el responsable</td>
+                                                    <td>Explico cómo voy a ejecutar la acción</td>
+                                                    <td>Fecha compromiso</td>
+                                                    <td>Costo o recursos</td>
+                                                    <td></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbodyPlanAccion">
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="plan-accion-empty" id="planAccionEmpty">
+                                        <p>No hay acciones registradas. Haga clic en "+ Agregar Acción" para comenzar.
+                                        </p>
+                                    </div>
+                                </div>
+                                <!-- FIN SECCIÓN 4 -->
+
+                                <button type="submit" class="submit-btn">Enviar Ciclo de Mejora</button>
+                            </form>
+                        </div>
+
+
+                        <div id="form-maquinas" class="report-form" style="display: none;">
+                            <form id="maquinasForm" onsubmit="submitMaquinasForm(event)">
+                                <h1 style="
+                                    padding: 0 0 25px;
+                                    TEXT-ALIGN: -WEBKIT-CENTER;
+                                color: #475569;
+                                "> Formulario de Anormalidades Criticas </h1>
+                                <hr
+                                    style="border: none;height: 2px;background-color: #e2e8f0;margin: 5px 0px 35px 0px;">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">PROCESO</label>
+                                        <select class="form-select" id="procesoMaquina" required onchange="updateAreaProceso()">
+                    <option value="">Selecciona el proceso</option>
+                    <option value="Pastificio">Pastificio</option>
+                    <option value="Empaque">Empaque</option>
+                </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">ÁREA DEL PROCESO</label>
+                                        <select class="form-select" id="areaProceso" required onchange="updateSubsistema()">
+                    <option value="">Selecciona el área</option>
+                </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">SUBSISTEMA</label>
+                                        <select class="form-select" id="subsistema" required>
+                    <option value="">Selecciona el subsistema</option>
+                </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">OTRO (En caso de que no esté en las opciones anteriores)</label>
+                                        <input type="text" class="form-input" id="otroSubsistema" placeholder="Especificar otro...">
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">MECANICO RESPONSABLE</label>
+                                        <input type="text" class="form-input" id="nombreMecanico" placeholder="Nombre del mecanico que reporta" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">ÁREA RESPONSABLE</label>
+                                        <select class="form-select" id="areaResponsable" required>
+                <option value="">Selecciona el área responsable</option>
+                <option value="Mecánicos">Mecánicos</option>
+                <option value="Eléctricos">Eléctricos</option>
+                <option value="Servicios">Servicios</option>
+                <option value="Producción">Producción</option>
+                <option value="Excelencia Operacional">Excelencia Operacional</option>
+            </select>
+                                    </div>
+
+                                    <!-- En el formulario de máquinas, después del campo ÁREA RESPONSABLE -->
+                                    <div class="form-group">
+                                        <label class="form-label">CRITICIDAD</label>
+                                        <select class="form-select" id="criticidadMaquina" required>
+        <option value="">Selecciona la criticidad</option>
+        <option value="Alta">Alta</option>
+        <option value="Media">Media</option>
+        <option value="Baja">Baja</option>
+    </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label class="form-label">ANORMALIDADES DE MANTENIMIENTO</label>
+                                    <textarea class="form-textarea" id="anormalidadMaquina" placeholder="Describa la anormalidad..." required></textarea>
+                                </div>
+
+                                <hr
+                                    style="border: none;height: 2px;background-color: #e2e8f0;margin: 35px 0px 35px 0px;">
+
+                                <button type="submit" class="submit-btn">Enviar Reporte</button>
+                            </form>
+                        </div>
+
+                        <div id="form-maquinas" class="report-form" style="display: none;">
+                            <div class="placeholder-content">
+                                <h2>Anormalidad Crítica (Máquinas)</h2>
+                                <p>Formulario en desarrollo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="n2" class="page">
+                <div class="board-header">
+                    <h1>N2</h1>
+                    <div class="board-actions">
+                        <button class="refresh-btn" onclick="loadN2Reports()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                <path d="M21 3v5h-5"/>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                                <path d="M3 21v-5h5"/>
+                            </svg>
+                            
+                        </button>
+                        <label for="ProcessFilter"></label>
+                        <select id="ProcessFilter" onchange="applyCombinedFilters()">
+                              <option value="allProcess">Todos los procesos</option>
+                              <option value="ProcessEmpaque">Empaque</option>
+                              <option value="ProcessPastificio">Pastificio</option>
+                              <option value="ProcessMolino">Molino</option>
+                              <option value="ProcessCEDI">CEDI</option>
+                              <option value="ProcessMantenimiento">Mantenimiento</option>
+                              <option value="ProcessAlmacenes">Almacenes Gral. y MP</option>
+                          </select>
+
+                        <label for="ProcessRespo"></label>
+                        <select id="ProcessRespo" onchange="applyCombinedFilters()">
+                              <option value="all">Todos los procesos res.</option>
+                                <option value="Seguridad y Salud en el trabajo">Seguridad y Salud en el trabajo</option>
+                                <option value="Eléctricos">Eléctricos</option>
+                                <option value="Calidad">Calidad</option>
+                                <option value="Excelencia Operacional">Excelencia Operacional</option>
+                                <option value="Ambiental">Ambiental</option>
+                                <option value="Gestión Humana">Gestión Humana</option>
+                                <option value="Planeación">Planeación</option>
+                                <option value="Servicio Técnico">Servicio Técnico</option>
+                                <option value="Mecanicos">Mecanicos</option>
+                                <option value="Autonomo">Autónomo</option>
+                          </select>
+
+                        <label for="reportFilter"></label>
+                        <select id="reportFilter" onchange="applyCombinedFilters()">
+                              <option value="all">Todos los reportes</option>
+                              <option value="myReports">Mis reportes creados</option>
+                              <option value="assignedToMe">Asignados a mí</option>
+                              <option value="myProcess">De mi proceso</option>
+                          </select>
+
+                        <input
+    type="text"
+    id="searchByName"
+    placeholder="Buscar por responsable..."
+    oninput="applyCombinedFilters()"
+    style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex: 1;"
+  />
+
+                    </div>
+                </div>
+
+                <div class="trello-board">
+                    <div class="board-column" data-status="Pendiente">
+                        <div class="column-header">
+                            <h3>Pendiente <i class="fa-regular fa-hand"></i></h3>
+                            <span class="card-count" id="pendiente-count">0</span>
+                        </div>
+                        <div class="cards-container" id="pendiente-cards">
+                            Cards will be loaded here
+                        </div>
+                    </div>
+
+                    <div class="board-column" data-status="En Progreso">
+                        <div class="column-header">
+                            <h3>En Progreso <i class="fa-solid fa-spinner"></i></h3>
+                            <span class="card-count" id="en-progreso-count">0</span>
+                        </div>
+                        <div class="cards-container" id="en-progreso-cards">
+                            Cards will be loaded here
+                        </div>
+                    </div>
+
+                    <div class="board-column" data-status="En Revision">
+                        <div class="column-header">
+                            <h3>En Revision <i class="fa-solid fa-glasses"></i></h3>
+                            <span class="card-count" id="en-revision-count">0</span>
+                        </div>
+                        <div class="cards-container" id="en-revision-cards">
+                            Cards will be loaded here
+                        </div>
+                    </div>
+
+                    <div class="board-column" data-status="Completado">
+                        <div class="column-header">
+                            <h3>Completado <i class="fa-regular fa-circle-check"></i></h3>
+                            <span class="card-count" id="completado-count">0</span>
+                        </div>
+                        <div class="cards-container" id="completado-cards">
+                            Cards will be loaded here
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tarjetas" class="page">
+                <div class="board-header">
+                    <h1>T.A</h1>
+                    <div class="board-actions">
+                        <button class="refresh-btn" onclick="loadTarjetasReports()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M3 21v-5h5"/>
+                </svg>
+                
+            </button>
+                        <select id="tarjetaPrioridadFilter" onchange="applyTarjetaPrioridadFilter()">
+                <option value="all">Todas las prioridades</option>
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+            </select>
+
+                        <select id="filtroResponsable" onchange="applyTarjetaFilters()">
+            <option value="">Todos los responsables</option>
+            <option value="Jefe del Area Seleccionada">Jefe del Area Seleccionada</option>
+            <option value="Jefe Aseguramiento de Calidad">Jefe Aseguramiento de Calidad</option>
+            <option value="Coordinador de Gestión Ambiental">Coordinador de Gestión Ambiental</option>
+            <option value="Equipo SST">Equipo SST</option>
+            <option value="Obras Civiles">Obras Civiles</option>
+            <option value="Reparaciones Metalmecanicas IMB">Reparaciones Metalmecanicas IMB</option>
+            <option value="Técnico Eléctrico">Técnico Eléctrico</option>
+            <option value="Técnico Mecánico">Técnico Mecánico</option>
+            <option value="Coordinador de Proyectos">Coordinador de Proyectos</option>
+            <option value="Servicios Técnicos">Servicios Técnicos</option>
+        </select>
+
+                        <select id="filtroTipo" onchange="applyTarjetaFilters()">
+            <option value="">Todos los tipos</option>
+            <option value="Parada autónoma">Parada autónoma</option>
+            <option value="Caminata cuidado por la vida">Caminata cuidado por la vida</option>
+            <option value="Tour Terreno">Tour Terreno</option>
+            <option value="Control de Proceso">Control de Proceso</option>
+            <option value="Actividades de COPASST">Actividades de COPASST</option>
+        </select>
+
+                        <select id="filtroRiesgo" onchange="applyTarjetaFilters()">
+            <option value="">Todos los riesgos</option>
+            <option value="Riesgo a las personas">Riesgo a las personas</option>
+            <option value="Riesgo ambiental">Riesgo ambiental</option>
+            <option value="Riesgo de inocuidad">Riesgo de inocuidad</option>
+            <option value="Riesgo de falla de equipo">Riesgo de falla de equipo</option>
+            <option value="Riesgo de calidad">Riesgo de calidad</option>
+        </select>
+
+                        <select id="filtroZona" onchange="applyTarjetaFilters()">
+            <option value="">Todas las zonas</option>
+                <option value="">Selecciona la zona de riesgo</option>
+                <option value="Logística - Materias Primas">Logística - Materias Primas</option>
+                <option value="Logistica - Almacen General">Logistica - Almacen General</option>
+                <option value="Manufactura - Molino">Manufactura - Molino</option>
+                <option value="Manufactura - Pastificio A">Manufactura - Pastificio A</option>
+                <option value="Manufactura - Pastificio B">Manufactura - Pastificio B</option>
+                <option value="Manufactura - Pastificio C">Manufactura - Pastificio C</option>
+                <option value="Manufactura - Pastificio D">Manufactura - Pastificio D</option>
+                <option value="Manufactura - Pastificio Lavamoldes">Manufactura - Lavamoldes</option>
+                <option value="Manufactura - Empaque Pasta Larga">Manufactura - Empaque Pasta Larga</option>
+                <option value="Manufactura - Empaque MQ 02">Manufactura - Empaque MQ 02</option>
+                <option value="Manufactura - Empaque MQ 03">Manufactura - Empaque MQ 03</option>
+                <option value="Manufactura - Empaque MQ 04">Manufactura - Empaque MQ 04</option>
+                <option value="Manufactura - Empaque MQ 05">Manufactura - Empaque MQ 05</option>
+                <option value="Manufactura - Empaque MQ 06">Manufactura - Empaque MQ 06</option>
+                <option value="Manufactura - Empaque Encartonadora PL">Manufactura - Empaque Encartonadora PL</option>
+                <option value="Manufactura - Empaque MQ 17">Manufactura - Empaque MQ 17</option>
+                <option value="Manufactura - Empaque MQ 18">Manufactura - Empaque MQ 18</option>
+                <option value="Manufactura - Empaque MQ 19">Manufactura - Empaque MQ 19</option>
+                <option value="Manufactura - Empaque MQ 20">Manufactura - Empaque MQ 20</option>
+                <option value="Manufactura - Empaque MQ 21">Manufactura - Empaque MQ 21</option>
+                <option value="Manufactura - Empaque Encartonadora PC">Manufactura -Empaque Encartonadora PC</option>
+                <option value="Manufactura - Empaque Linea Vaso">Manufactura - Empaque Linea Vaso</option>
+                <option value="Edificio Información Manufactura">Edificio Información Manufactura</option>
+                <option value="Manufactura - Empaque Celdas Robóticas">Manufactura - Empaque Celdas Robóticas</option>
+                <option value="Ingenieria y Montajes">Ingenieria y Montajes</option>
+                <option value="Servicios Tecnicos">Servicios Tecnicos</option>
+                <option value="Metrología">Metrología</option>
+                <option value="SDM">SDM</option>
+                <option value="Empaques especiales">Empaques especiales (CEMPA)</option>
+                <option value="Logistica CEDI A">Logistica CEDI A</option>
+                <option value="Logistica CEDI B">Logistica CEDI B</option>
+                <option value="Laboratorio I+D">Laboratorio I+D</option>
+                <option value="Edificio Administrativo">Edificio Administrativo</option>
+                <option value="Lockers vinculados Edificio Administrativo">Lockers vinculados Edificio Administrativo</option>
+                <option value="Exteriores">Exteriores</option>
+                <option value="Plantas de tratamiento de aguas Residuales">Plantas de tratamiento de aguas Residuales (PTAR)</option>
+                <option value="Plantas de tratamiento de agua Potable">Plantas de tratamiento de agua Potable (PTAP)</option>
+                <option value="Bodega de excedentes industriales">Bodega de excedentes industriales</option>
+                <option value="Zonas de contratistas">Zonas de contratistas</option>
+                <option value="Portería">Portería</option>
+                <option value="Casino">Casino</option>
+                <option value="Cuarto de Baterías">Cuarto de Baterías</option>
+                <option value="Cuarto Venta de Empleados">Cuarto Venta de Empleados</option>
+                <option value="Taller de Mantenimientos">Taller de Mantenimientos</option>
+        </select>
+                        <input
+            type="text"
+            id="searchCreator"
+            placeholder="Buscar por creador..."
+            onkeyup="applyTarjetaFilters()"
+            style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex: 1; max-width: 145px;"
+        >
+                    </div>
+                </div>
+
+                <div class="tarjetas-board">
+                    <div class="board-column" data-status="Abierta">
+                        <div class="column-header">
+                            <h3>Abiertas <i class="fa-solid fa-envelope-open"></i></h3>
+                            <span class="card-count" id="abiertas-count">0</span>
+                        </div>
+                        <div class="cards-container-tarjetas" id="abiertas-cards">
+                            <!-- Cards will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="board-column" data-status="Cerrada">
+                        <div class="column-header">
+                            <h3>Cerradas <i class="fa-solid fa-envelope-circle-check"></i></h3>
+                            <span class="card-count" id="cerradas-count">0</span>
+                        </div>
+                        <div class="cards-container-tarjetas" id="cerradas-cards">
+                            <!-- Cards will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CM -->
+
+            <div id="ciclos" class="page">
+                <div class="board-header">
+                    <h1>Gestión de Ciclos de Mejora</h1>
+                    <div class="board-actions">
+                        <button class="refresh-btn" onclick="loadCiclosMejora()" title="Actualizar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M3 21v-5h5"/>
+                </svg>
+            </button>
+
+                        <select id="ciclosProcesoFilter" class="filter-select" onchange="applyCiclosFilters()">
+                <option value="all">Todos los procesos</option>
+                <option value="Empaque">Empaque</option>
+                <option value="Pastificio">Pastificio</option>
+                <option value="Molino">Molino</option>
+                <option value="CEDI">CEDI</option>
+                <option value="Mantenimiento">Mantenimiento</option>
+                <option value="Almacenes Gral. y MP">Almacenes Gral. y MP</option>
+                <option value="Calidad">Calidad</option>
+                <option value="Administración">Administración</option>
+            </select>
+
+                        <select id="ciclosEstadoFilter" class="filter-select" onchange="applyCiclosFilters()">
+                <option value="all">Todos los estados</option>
+                <option value="Abierto">Abierto</option>
+                <option value="En Progreso">En Progreso</option>
+                <option value="Implementado">Implementado</option>
+                <option value="Cerrado">Cerrado</option>
+            </select>
+
+                        <input
+                type="text"
+                id="ciclosSearchInput"
+                class="search-input-ciclos"
+                placeholder="Buscar por ID, nombre o líder..."
+                oninput="applyCiclosFilters()"
+            />
+                    </div>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="ciclos-stats-grid">
+                    <div class="ciclo-stat-card stat-abierto">
+                        <div class="ciclo-stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 6v6l4 2" />
+                            </svg>
+                        </div>
+                        <div class="ciclo-stat-info">
+                            <span class="ciclo-stat-number" id="ciclos-stat-abierto">0</span>
+                            <span class="ciclo-stat-label">Abiertos</span>
+                        </div>
+                    </div>
+                    <div class="ciclo-stat-card stat-progreso">
+                        <div class="ciclo-stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
+                            </svg>
+                        </div>
+                        <div class="ciclo-stat-info">
+                            <span class="ciclo-stat-number" id="ciclos-stat-progreso">0</span>
+                            <span class="ciclo-stat-label">En Progreso</span>
+                        </div>
+                    </div>
+                    <div class="ciclo-stat-card stat-implementado">
+                        <div class="ciclo-stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 12l2 2 4-4" />
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                        </div>
+                        <div class="ciclo-stat-info">
+                            <span class="ciclo-stat-number" id="ciclos-stat-implementado">0</span>
+                            <span class="ciclo-stat-label">Implementados</span>
+                        </div>
+                    </div>
+                    <div class="ciclo-stat-card stat-cerrado">
+                        <div class="ciclo-stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                        </div>
+                        <div class="ciclo-stat-info">
+                            <span class="ciclo-stat-number" id="ciclos-stat-cerrado">0</span>
+                            <span class="ciclo-stat-label">Cerrados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de ciclos -->
+                <div class="ciclos-table-wrapper">
+                    <table class="ciclos-data-table" id="tablaCiclos">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">ID <i class="fa-solid fa-list-ol"></i></th>
+                                <th style="width: 140px;">Fecha <i class="fa-regular fa-calendar"></i></th>
+                                <th style="min-width: 200px;">Nombre del Ciclo <i class="fa-solid fa-file-pen"></i></th>
+                                <th style="width: 120px;">Proceso <i class="fa-solid fa-recycle"></i></th>
+                                <th style="width: 185px;">Equipo/Máquina <i class="fa-solid fa-desktop"></i></th>
+                                <th style="width: 280px;">Líder <i class="fa-solid fa-circle-user"></i></th>
+                                <th style="width: 90px;">Foco <i class="fa-regular fa-lightbulb"></i></th>
+                                <th style="width: 130px;">Estado <i class="fa-solid fa-list"></i></th>
+                                <th style="width: 80px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyCiclos">
+                            <tr>
+                                <td colspan="9" class="ciclos-loading-cell">
+                                    <div class="ciclos-loading-spinner">
+                                        <svg class="spinner-icon" width="20" height="20" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"
+                                                fill="none" opacity="0.25" />
+                                            <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3"
+                                                fill="none" stroke-linecap="round" />
+                                        </svg>
+                                        <span>Cargando ciclos de mejora...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MODAL DETALLE CICLO -->
+            <div class="modal-overlay-ciclo" id="modalDetalleCiclo">
+                <div class="modal-ciclo-content">
+                    <button class="modal-ciclo-close" onclick="cerrarModalCiclo()">&times;</button>
+
+                    <div class="modal-ciclo-header-info">
+                        <span class="modal-ciclo-id-badge" id="modalCicloId">CM-001</span>
+                        <span class="modal-ciclo-estado-badge" id="modalCicloEstado">Abierto</span>
+                    </div>
+
+                    <h2 class="modal-ciclo-title" id="modalCicloTitulo">Nombre del Ciclo</h2>
+
+                    <div class="modal-ciclo-tabs-container">
+                        <button class="modal-tab-btn active" onclick="cambiarTabCiclo('info')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/>
+                </svg>
+                Información
+            </button>
+                        <button class="modal-tab-btn" onclick="cambiarTabCiclo('analisis')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Análisis
+            </button>
+                        <button class="modal-tab-btn" onclick="cambiarTabCiclo('acciones')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Plan de Acción
+            </button>
+                        <button class="modal-tab-btn" onclick="cambiarTabCiclo('seguimiento')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Seguimiento
+            </button>
+                    </div>
+
+                    <!-- TAB: Información General -->
+                    <div class="modal-tab-content active" id="tab-info">
+                        <div class="info-cards-grid">
+                            <div class="info-card-item">
+                                <label>Fecha de Registro</label>
+                                <span id="modalCicloFecha">-</span>
+                            </div>
+                            <div class="info-card-item">
+                                <label>Proceso</label>
+                                <span id="modalCicloProceso">-</span>
+                            </div>
+                            <div class="info-card-item">
+                                <label>Equipo / Máquina</label>
+                                <span id="modalCicloEquipo">-</span>
+                            </div>
+                            <div class="info-card-item">
+                                <label>Aviso Mantenimiento</label>
+                                <span id="modalCicloAviso">-</span>
+                            </div>
+                            <div class="info-card-item">
+                                <label>Líder Responsable</label>
+                                <span id="modalCicloLider">-</span>
+                            </div>
+                            <div class="info-card-item full-width">
+                                <label>Integrantes del Análisis</label>
+                                <span id="modalCicloIntegrantes">-</span>
+                            </div>
+                        </div>
+
+                        <div class="info-section-block">
+                            <h4>Foco de Mejora</h4>
+                            <div class="foco-detalle-box" id="modalCicloFocoDetalle"></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Análisis -->
+                    <div class="modal-tab-content" id="tab-analisis">
+                        <div class="info-section-block">
+                            <h4>Defecto / Problema Principal</h4>
+                            <div class="defecto-display-box" id="modalCicloDefecto">-</div>
+                        </div>
+
+                        <div class="info-section-block">
+                            <h4>Espina de Pescado (Causas por Categoría)</h4>
+                            <div class="espina-grid" id="modalCicloEspina"></div>
+                        </div>
+
+                        <div class="info-section-block">
+                            <h4>Análisis 5 Por Qué</h4>
+                            <div class="porques-container" id="modalCicloPorques"></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Plan de Acción -->
+                    <div class="modal-tab-content" id="tab-acciones">
+                        <div class="info-section-block">
+                            <h4>Plantilla 5W+2H</h4>
+                            <div class="plan-resumen-table" id="modalCicloPlanAccion"></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Seguimiento -->
+                    <div class="modal-tab-content" id="tab-seguimiento">
+                        <div class="seguimiento-form-box">
+                            <h4>Actualizar Estado</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nuevo Estado</label>
+                                    <select class="form-select" id="nuevoEstadoCiclo">
+                            <option value="Abierto">Abierto</option>
+                            <option value="En Progreso">En Progreso</option>
+                            <option value="Implementado">Implementado</option>
+                            <option value="Cerrado">Cerrado</option>
+                        </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Comentario</label>
+                                <textarea class="form-textarea" id="comentarioCiclo" placeholder="Agregue un comentario sobre el cambio de estado o avance del ciclo..." rows="3"></textarea>
+                            </div>
+                            <button type="button" class="btn-guardar-seguimiento" onclick="guardarSeguimientoCiclo()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                        <polyline points="17,21 17,13 7,13 7,21"/>
+                        <polyline points="7,3 7,8 15,8"/>
+                    </svg>
+                    Guardar Seguimiento
+                </button>
+                        </div>
+
+                        <div class="historial-section">
+                            <h4>Historial de Seguimiento</h4>
+                            <div class="timeline-wrapper" id="timelineCiclo"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CM -->
+
+            <div id="anormalidades" class="page">
+                <div class="board-header">
+                    <h1>Anormalidades Críticas (Máquinas)</h1>
+                    <div class="board-actions">
+                        <button class="refresh-btn" onclick="loadMaquinasReports()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M3 21v-5h5"/>
+                </svg>
+                
+            </button>
+
+                        <select id="maquinasProcesoFilter" onchange="applyMaquinasFilters()">
+                <option value="all">Todos los procesos</option>
+                <option value="Pastificio">Pastificio</option>
+                <option value="Empaque">Empaque</option>
+            </select>
+
+                        <select id="maquinasAreaprocFilter" onchange="applyMaquinasFilters()">
+                <option value="all">Todas las áreas del proceso</option>
+                <option value="Linea A">Linea A</option>
+                <option value="Linea B">Linea B</option>
+                <option value="Linea C">Linea C</option>
+                <option value="Linea D">Linea D</option>
+                <option value="SIRCEM">SIRCEM</option>
+                <option value="Girapasta">Girapasta</option>
+                <option value="Máquina 02">Máquina 02</option>
+                <option value="Máquina 03">Máquina 03</option>
+                <option value="Máquina 04">Máquina 04</option>
+                <option value="Máquina 05">Máquina 05</option>
+                <option value="Máquina 06">Máquina 06</option>
+                <option value="Máquina 17">Máquina 17</option>
+                <option value="Máquina 18">Máquina 18</option>
+                <option value="Máquina 19">Máquina 19</option>
+                <option value="Máquina 20">Máquina 20</option>
+                <option value="Máquina 21">Máquina 21</option>
+                <option value="Encartonadora PL">Encartonadora PL</option>
+                <option value="Encartonadora PC">Encartonadora PC</option>
+            </select>
+
+                        <select id="maquinasAreaFilter" onchange="applyMaquinasFilters()">
+                <option value="all">Todas las áreas responsables</option>
+                <option value="Mecánicos">Mecánicos</option>
+                <option value="Eléctricos">Eléctricos</option>
+                <option value="Servicios">Servicios</option>
+                <option value="Producción">Producción</option>
+                <option value="Excelencia Operacional">Excelencia Operacional</option>
+            </select>
+
+                        <input
+                type="text"
+                id="maquinasSearchByName"
+                placeholder="Buscar por mecánico..."
+                oninput="applyMaquinasFilters()"
+                style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex: 1;"
+            />
+                    </div>
+                </div>
+
+                <div class="trello-board">
+                    <div class="board-column" data-status="Abierto">
+                        <div class="column-header">
+                            <h3>Abierto <i class="fa-solid fa-envelope-open-text"></i></h3>
+                            <span class="card-count" id="maquinas-abierto-count">0</span>
+                        </div>
+                        <div class="cards-container" id="maquinas-abierto-cards">
+                            <!-- Cards will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="board-column" data-status="En Progreso">
+                        <div class="column-header">
+                            <h3>En Progreso <i class="fa-solid fa-spinner"></i></h3>
+                            <span class="card-count" id="maquinas-en-progreso-count">0</span>
+                        </div>
+                        <div class="cards-container" id="maquinas-en-progreso-cards">
+                            <!-- Cards will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="board-column" data-status="Cerrado">
+                        <div class="column-header">
+                            <h3>Cerrado <i class="fa-solid fa-envelope-circle-check"></i></h3>
+                            <span class="card-count" id="maquinas-cerrado-count">0</span>
+                        </div>
+                        <div class="cards-container" id="maquinas-cerrado-cards">
+                            <!-- Cards will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="consolidado" class="page">
+                <div class="board-header">
+                    <h1>Consolidado</h1>
+                    <div class="board-actions">
+                        <button class="refresh-btn" onclick="loadConsolidadoReports()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M3 21v-5h5"/>
+                </svg>
+                
+            </button>
+                        <select id="ConsolidadoFilter" onchange="filterConsolidadoByName()">
+                <option value="all">Tipo de reporte...</option>
+                <option value="N2">N2</option>
+                <option value="Tarjetas de Anormalidades">Tarjetas de Anormalidades</option>
+                <option value="Anormalidades Criticas">Anormalidades Criticas</option>
+                <option value="Ciclos de mejora">Ciclos de mejora</option>
+            </select>
+                        <select id="consolidadoProcesoFilter" onchange="filterConsolidadoByProcess()">
+                <option value="all">Todos los procesos</option>
+                
+            </select>
+                        <input
+                type="text"
+                id="consolidadoSearch"
+                placeholder="Buscar por nombre..."
+                oninput="filterConsolidadoByName()"
+                style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; flex: 1; max-width: 280px;"
+            />
+                    </div>
+                </div>
+
+                <div id="consolidadoContainer" style="display: grid; gap: 1.5rem;">
+                    <!-- Los reportes consolidados se cargarán aquí -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <?!= include('JavaScript'); ?>
+</body>
+
+</html>
