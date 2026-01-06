@@ -89,6 +89,9 @@ function showTarjetasStatsModal() {
             <button onclick="switchTab('riesgo-problema')" class="stats-tab active" data-tab="riesgo-problema">
                 <i class="fa-solid fa-triangle-exclamation"></i> Riesgo/Problema
             </button>
+            <button onclick="switchTab('riesgo-anual')" class="stats-tab" data-tab="riesgo-anual">
+                <i class="fa-solid fa-calendar-check"></i> Riesgo/Problema por año
+            </button>
             <button onclick="switchTab('responsable-cargo')" class="stats-tab" data-tab="responsable-cargo">
                 <i class="fa-solid fa-user-tie"></i> Por Responsable
             </button>
@@ -169,7 +172,9 @@ function switchTab(tabName) {
     setTimeout(() => {
         // Cambia las llamadas para usar las funciones correctas
         if (tabName === 'riesgo-problema') {
-            loadRiesgoProblemaTab(); // Esta función debería cargar la pestaña
+            loadRiesgoProblemaTab();
+        } else if (tabName === 'riesgo-anual') {
+            loadRiesgoAnualTab(); 
         } else if (tabName === 'responsable-cargo') {
             loadResponsableCargoTab();
         } else if (tabName === 'lider-solucion') {
@@ -397,7 +402,7 @@ function loadRiesgoProblemaTab() {
     tabContent.innerHTML = `
         <div style="margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 18px;">
-                <i class="fa-solid fa-triangle-exclamation"></i> % Gestión por Riesgo y Problema asociado
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right: 10px;"></i> Gestión por Riesgo y Problema asociado
             </h3>
             
             <div id="statsSummary" style="
@@ -507,7 +512,7 @@ function loadResponsableCargoTab() {
     tabContent.innerHTML = `
         <div style="margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 18px;">
-                <i class="fa-solid fa-user-tie"></i> % Gestión por Responsable por Cargo de la Solución
+                <i class="fa-solid fa-user-tie" style="margin-right: 10px;"></i> Gestión por Responsable por Cargo de la Solución
             </h3>
             
             <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -587,7 +592,7 @@ function loadLiderSolucionTab() {
     tabContent.innerHTML = `
         <div style="margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 18px;">
-                <i class="fa-solid fa-user-check"></i> % Gestión por Líder de la Solución
+                <i class="fa-solid fa-user-check" style="margin-right: 10px;"></i> Gestión por Líder de la Solución
             </h3>
             
             <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -669,6 +674,9 @@ function loadCurrentTabStats() {
     switch(tabName) {
         case 'riesgo-problema':
             loadRiesgoProblemaStats();
+            break;
+        case 'riesgo-anual':
+            loadRiesgoAnualStats();
             break;
         case 'responsable-cargo':
             loadResponsableCargoStats();
@@ -927,6 +935,9 @@ function exportCurrentTabStats() {
         case 'riesgo-problema':
             functionName = 'exportTarjetasStatsToCSV';
             break;
+        case 'riesgo-anual':
+            functionName = 'exportRiesgoAnualStatsToCSV'; 
+            break;
         case 'responsable-cargo':
             functionName = 'exportResponsableCargoStatsToCSV';
             break;
@@ -1019,7 +1030,7 @@ function loadZonaRiesgoTab() {
     tabContent.innerHTML = `
         <div style="margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 18px;">
-                <i class="fa-solid fa-map-marker-alt"></i> % Gestión por Zona de Riesgo
+                <i class="fa-solid fa-map-marker-alt" style="margin-right: 10px;"></i> Gestión por Zona de Riesgo
             </h3>
             
             <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -1029,7 +1040,7 @@ function loadZonaRiesgoTab() {
                 <div style="display: flex; gap: 12px;">
                     <button onclick="loadZonaRiesgoStats()" style="
                         padding: 8px 16px;
-                        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                        background: #3b82f6;
                         color: white;
                         border: none;
                         border-radius: 6px;
@@ -1038,13 +1049,12 @@ function loadZonaRiesgoTab() {
                         display: flex;
                         align-items: center;
                         gap: 6px;
-                        transition: all 0.3s ease;
                     ">
                         <i class="fa-solid fa-rotate"></i> Actualizar
                     </button>
                     <button onclick="exportZonaRiesgoStats()" style="
                         padding: 8px 16px;
-                        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+                        background: #10b981;
                         color: white;
                         border: none;
                         border-radius: 6px;
@@ -1053,7 +1063,6 @@ function loadZonaRiesgoTab() {
                         display: flex;
                         align-items: center;
                         gap: 6px;
-                        transition: all 0.3s ease;
                     ">
                         <i class="fa-solid fa-file-export"></i> Exportar
                     </button>
@@ -1109,7 +1118,7 @@ function loadTipoReporteTab() {
     tabContent.innerHTML = `
         <div style="margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 18px;">
-                <i class="fa-solid fa-file-alt"></i> % Gestión por Tipo de Reporte
+                <i class="fa-solid fa-file-alt" style="margin-right: 10px;"></i> Gestión por Tipo de Reporte
             </h3>
             
             <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -1119,7 +1128,7 @@ function loadTipoReporteTab() {
                 <div style="display: flex; gap: 12px;">
                     <button onclick="loadTipoReporteStats()" style="
                         padding: 8px 16px;
-                        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                        background: #3b82f6;
                         color: white;
                         border: none;
                         border-radius: 6px;
@@ -1128,13 +1137,12 @@ function loadTipoReporteTab() {
                         display: flex;
                         align-items: center;
                         gap: 6px;
-                        transition: all 0.3s ease;
                     ">
                         <i class="fa-solid fa-rotate"></i> Actualizar
                     </button>
                     <button onclick="exportTipoReporteStats()" style="
                         padding: 8px 16px;
-                        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+                        background: #10b981;
                         color: white;
                         border: none;
                         border-radius: 6px;
@@ -1143,7 +1151,6 @@ function loadTipoReporteTab() {
                         display: flex;
                         align-items: center;
                         gap: 6px;
-                        transition: all 0.3s ease;
                     ">
                         <i class="fa-solid fa-file-export"></i> Exportar
                     </button>
@@ -1199,7 +1206,7 @@ function loadMensualTab() {
     tabContent.innerHTML = `
         <div style="margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 18px;">
-                <i class="fa-solid fa-calendar-alt"></i> % Gestión Mensual
+                <i class="fa-solid fa-calendar-alt" style="margin-right: 10px;"></i> Gestión Mensual
             </h3>
             
             <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -1209,7 +1216,7 @@ function loadMensualTab() {
                 <div style="display: flex; gap: 12px;">
                     <button onclick="loadMensualStats()" style="
                         padding: 8px 16px;
-                        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                        background: #3b82f6;
                         color: white;
                         border: none;
                         border-radius: 6px;
@@ -1218,13 +1225,12 @@ function loadMensualTab() {
                         display: flex;
                         align-items: center;
                         gap: 6px;
-                        transition: all 0.3s ease;
                     ">
                         <i class="fa-solid fa-rotate"></i> Actualizar
                     </button>
                     <button onclick="exportMensualStats()" style="
                         padding: 8px 16px;
-                        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+                        background: #10b981;
                         color: white;
                         border: none;
                         border-radius: 6px;
@@ -1233,7 +1239,6 @@ function loadMensualTab() {
                         display: flex;
                         align-items: center;
                         gap: 6px;
-                        transition: all 0.3s ease;
                     ">
                         <i class="fa-solid fa-file-export"></i> Exportar
                     </button>
@@ -1683,6 +1688,626 @@ function exportMensualStats() {
             showAlert('error', 'Error', 'Error al exportar: ' + error.message);
         })
         .exportMensualStatsToCSV();
+}
+
+function loadRiesgoAnualTab() {
+    const tabContent = document.getElementById('tabContent');
+    
+    tabContent.innerHTML = `
+        <div style="margin-bottom: 24px;">
+            <h3 style="style="margin: 0 0 16px 0; color: #374151; font-size: 18px;"">
+                <i class="fa-solid fa-calendar-check" style="color: #0f307f; margin-right: 10px;"></i>
+                <span>Gestión por Riesgo y Problema por Año</span>
+            </h3>
+            
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 16px; gap: 12px;">
+                <button onclick="loadRiesgoAnualStats()" style="
+                    padding: 8px 16px;
+                    background: #3b82f6;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                ">
+                    <i class="fa-solid fa-rotate"></i> Actualizar
+                </button>
+                <button onclick="exportRiesgoAnualStats()" style="
+                    padding: 8px 16px;
+                    background: #10b981;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                ">
+                    <i class="fa-solid fa-file-export"></i> Exportar CSV
+                </button>
+            </div>
+            
+            <div id="annualStatsContent">
+                <!-- Aquí se cargarán las tablas organizadas por año -->
+                <div style="text-align: center; padding: 40px; color: #6b7280;">
+                    <div style="margin-bottom: 16px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px;"></i>
+                    </div>
+                    <div>Cargando estadísticas por año...</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    loadRiesgoAnualStats();
+}
+
+// Función para cargar las estadísticas anuales
+function loadRiesgoAnualStats() {
+    const annualStatsContent = document.getElementById('annualStatsContent');
+    
+    if (!annualStatsContent) return;
+    
+    annualStatsContent.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #6b7280;">
+            <div style="margin-bottom: 16px;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px;"></i>
+            </div>
+            <div>Cargando estadísticas por año...</div>
+        </div>
+    `;
+    
+    google.script.run
+        .withSuccessHandler(function(result) {
+            if (result.success) {
+                renderRiesgoAnualStats(result.data, result.summary);
+            } else {
+                showErrorInAnnualStats(result.message);
+            }
+        })
+        .withFailureHandler(function(error) {
+            console.error('Error cargando estadísticas anuales:', error);
+            showErrorInAnnualStats('Error al cargar las estadísticas: ' + error.message);
+        })
+        .getRiesgoAnualStats('todos');
+}
+
+// Función modificada para renderizar las estadísticas anuales
+function renderRiesgoAnualStats(data, summary) {
+    const annualStatsContent = document.getElementById('annualStatsContent');
+    
+    if (!annualStatsContent) return;
+    
+    if (!data || data.length === 0) {
+        annualStatsContent.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #6b7280;">
+                <div style="margin-bottom: 16px;">
+                    <i class="fa-solid fa-database" style="font-size: 24px;"></i>
+                </div>
+                <div>No hay datos disponibles</div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Estructuras de datos para ambas tablas
+    const dataByTipoRiesgo = {}; // Para tabla 1: % Gestión
+    const dataByTipoYProblema = {}; // Para tabla 2: Detalle por problema y año
+    let globalTotalAbierta = 0;
+    let globalTotalCerrada = 0;
+    let globalTotalGeneral = 0;
+    
+    // Procesar los datos
+    data.forEach(row => {
+        const ano = row.ano || 'Sin año';
+        const tipoRiesgo = row.tipoRiesgo;
+        const problema = row.problema || 'Sin problema';
+        
+        // Para la tabla de % Gestión (primera tabla)
+        if (!row.isGlobalTotal && !row.isYearTotal && row.isRiesgoTotal) {
+            if (!dataByTipoRiesgo[tipoRiesgo]) {
+                dataByTipoRiesgo[tipoRiesgo] = {
+                    anos: {},
+                    totalAbierta: 0,
+                    totalCerrada: 0,
+                    totalGeneral: 0
+                };
+            }
+            
+            if (!dataByTipoRiesgo[tipoRiesgo].anos[ano]) {
+                dataByTipoRiesgo[tipoRiesgo].anos[ano] = {
+                    abierta: 0,
+                    cerrada: 0,
+                    total: 0
+                };
+            }
+            
+            dataByTipoRiesgo[tipoRiesgo].anos[ano].abierta = row.abierta;
+            dataByTipoRiesgo[tipoRiesgo].anos[ano].cerrada = row.cerrada;
+            dataByTipoRiesgo[tipoRiesgo].anos[ano].total = row.total;
+            
+            dataByTipoRiesgo[tipoRiesgo].totalAbierta += row.abierta;
+            dataByTipoRiesgo[tipoRiesgo].totalCerrada += row.cerrada;
+            dataByTipoRiesgo[tipoRiesgo].totalGeneral += row.total;
+        }
+        
+        // Para la tabla detallada por problema (segunda tabla)
+        if (!row.isGlobalTotal && !row.isYearTotal && !row.isRiesgoTotal) {
+            if (!dataByTipoYProblema[tipoRiesgo]) {
+                dataByTipoYProblema[tipoRiesgo] = {
+                    problemas: {},
+                    totalAbierta: 0,
+                    totalCerrada: 0,
+                    totalGeneral: 0
+                };
+            }
+            
+            if (!dataByTipoYProblema[tipoRiesgo].problemas[problema]) {
+                dataByTipoYProblema[tipoRiesgo].problemas[problema] = {
+                    anos: {},
+                    totalAbierta: 0,
+                    totalCerrada: 0,
+                    totalGeneral: 0
+                };
+            }
+            
+            dataByTipoYProblema[tipoRiesgo].problemas[problema].anos[ano] = {
+                abierta: row.abierta,
+                cerrada: row.cerrada,
+                total: row.total
+            };
+            
+            dataByTipoYProblema[tipoRiesgo].problemas[problema].totalAbierta += row.abierta;
+            dataByTipoYProblema[tipoRiesgo].problemas[problema].totalCerrada += row.cerrada;
+            dataByTipoYProblema[tipoRiesgo].problemas[problema].totalGeneral += row.total;
+            
+            dataByTipoYProblema[tipoRiesgo].totalAbierta += row.abierta;
+            dataByTipoYProblema[tipoRiesgo].totalCerrada += row.cerrada;
+            dataByTipoYProblema[tipoRiesgo].totalGeneral += row.total;
+        }
+        
+        // Calcular totales globales
+        if (row.isGlobalTotal) {
+            globalTotalAbierta = row.abierta;
+            globalTotalCerrada = row.cerrada;
+            globalTotalGeneral = row.total;
+        }
+    });
+    
+    let html = '';
+    
+    // PRIMERA TABLA: % Gestión por Riesgo
+    html += `
+        <div style="margin-bottom: 32px;">
+            <div style="
+                background: #1d4ed8;
+                color: white;
+                padding: 16px 20px;
+                border-radius: 8px 8px 0 0;
+                box-shadow: 0 4px 6px rgba(15, 48, 127, 0.2);
+            ">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fa-solid fa-percentage" style="font-size: 20px;"></i>
+                    <h4 style="margin: 0; font-size: 18px; font-weight: 600;">% Gestión por Riesgo</h4>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead style="background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border-bottom: 2px solid #e5e7eb;">
+                        <tr>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 40px;"></th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Tipo_Riesgo</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 100px;">Año</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 100px;">Abierta</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 100px;">Cerrada</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 120px;">Suma total</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 120px;">% Gestión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    // Ordenar tipos de riesgo
+    const tiposRiesgoOrdenados = Object.keys(dataByTipoRiesgo).sort();
+    let totalSumaAbierta = 0;
+    let totalSumaCerrada = 0;
+    let totalSumaTotal = 0;
+    
+    tiposRiesgoOrdenados.forEach((tipoRiesgo, index) => {
+        const tipoData = dataByTipoRiesgo[tipoRiesgo];
+        const rowId = `riesgo-tipo-${index}`;
+        const rowStyle = index % 2 === 0 ? 'background: #ffffff;' : 'background: #f9fafb;';
+        
+        // Calcular porcentaje total del tipo de riesgo
+        const porcentajeTipo = tipoData.totalGeneral > 0 ? 
+            ((tipoData.totalCerrada / tipoData.totalGeneral) * 100).toFixed(2) : '0.00';
+        
+        let porcentajeBgColor = '#ef4444';
+        const porcentajeNum = parseFloat(porcentajeTipo);
+        if (porcentajeNum >= 80) {
+            porcentajeBgColor = '#10b981';
+        } else if (porcentajeNum >= 50) {
+            porcentajeBgColor = '#f59e0b';
+        } else if (porcentajeNum > 0) {
+            porcentajeBgColor = '#ef4444';
+        }
+        
+        // Fila principal del tipo de riesgo (expandible)
+        html += `
+            <tr style="${rowStyle} cursor: pointer;" onclick="toggleRiesgoDetalle('${rowId}')">
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                    <i id="icon-${rowId}" class="fa-solid fa-caret-right" style="color: #6b7280; transition: transform 0.2s;"></i>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1f2937;">${tipoRiesgo}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${tipoData.totalAbierta}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${tipoData.totalCerrada}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${tipoData.totalGeneral}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 400; color: ${porcentajeBgColor};">${porcentajeTipo}%</td>
+            </tr>
+        `;
+        
+        // Filas expandibles con detalles por año
+        const years = Object.keys(tipoData.anos).sort((a, b) => {
+            if (a === 'Sin año') return 1;
+            if (b === 'Sin año') return -1;
+            return parseInt(a) - parseInt(b);
+        });
+        
+        years.forEach(ano => {
+            const anoData = tipoData.anos[ano];
+            const porcentajeAno = anoData.total > 0 ? 
+                ((anoData.cerrada / anoData.total) * 100).toFixed(2) : '0.00';
+            
+            let porcentajeAnoBgColor = '#ef4444';
+            const porcentajeAnoNum = parseFloat(porcentajeAno);
+            if (porcentajeAnoNum >= 80) {
+                porcentajeAnoBgColor = '#10b981';
+            } else if (porcentajeAnoNum >= 50) {
+                porcentajeAnoBgColor = '#f59e0b';
+            } else if (porcentajeAnoNum > 0) {
+                porcentajeAnoBgColor = '#ef4444';
+            }
+            
+            html += `
+                <tr id="${rowId}-${ano}" style="display: none; ${rowStyle}">
+                    <td style="padding: 12px 12px 12px 40px; border-bottom: 1px solid #e5e7eb;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 500;">${ano}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${anoData.abierta}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${anoData.cerrada}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${anoData.total}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 400; color: ${porcentajeAnoBgColor};">${porcentajeAno}%</td>
+                </tr>
+            `;
+        });
+        
+        // Fila de total por tipo de riesgo
+        html += `
+            <tr style="background: #e5e7eb;">
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; font-weight: 700; color: #1f2937;">Total ${tipoRiesgo}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${tipoData.totalAbierta}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${tipoData.totalCerrada}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${tipoData.totalGeneral}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 400; color: ${porcentajeBgColor};">${porcentajeTipo}%</td>
+            </tr>
+        `;
+        
+        totalSumaAbierta += tipoData.totalAbierta;
+        totalSumaCerrada += tipoData.totalCerrada;
+        totalSumaTotal += tipoData.totalGeneral;
+    });
+    
+    // Fila de suma total
+    const porcentajeGlobal = totalSumaTotal > 0 ? 
+        ((totalSumaCerrada / totalSumaTotal) * 100).toFixed(2) : '0.00';
+    
+    let porcentajeGlobalBgColor = '#ef4444';
+    const porcentajeGlobalNum = parseFloat(porcentajeGlobal);
+    if (porcentajeGlobalNum >= 80) {
+        porcentajeGlobalBgColor = '#10b981';
+    } else if (porcentajeGlobalNum >= 50) {
+        porcentajeGlobalBgColor = '#f59e0b';
+    } else if (porcentajeGlobalNum > 0) {
+        porcentajeGlobalBgColor = '#ef4444';
+    }
+    
+    html += `
+                        <tr style="background: linear-gradient(135deg, #374151 0%, #1f2937 100%); color: white;">
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;"></td>
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;">Suma total</td>
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;"></td>
+                            <td style="padding: 12px; text-align: center; font-weight: 700; border-top: 2px solid #4b5563;">${totalSumaAbierta}</td>
+                            <td style="padding: 12px; text-align: center; font-weight: 700; border-top: 2px solid #4b5563;">${totalSumaCerrada}</td>
+                            <td style="padding: 12px; text-align: center; font-weight: 700; border-top: 2px solid #4b5563;">${totalSumaTotal}</td>
+                            <td style="padding: 12px; text-align: center; font-weight: 700; color: ${porcentajeGlobalBgColor}; border-top: 2px solid #4b5563;">${porcentajeGlobal}%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    // SEGUNDA TABLA: COUNTA de Tipo_Riesgo (Detalle por Problema y Año)
+    html += `
+        <div style="margin-bottom: 32px;">
+            <div style="
+                background: #1d4ed8;
+                color: white;
+                padding: 16px 20px;
+                border-radius: 8px 8px 0 0;
+                box-shadow: 0 4px 6px rgba(15, 48, 127, 0.2);
+            ">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fa-solid fa-list-check" style="font-size: 20px;"></i>
+                    <h4 style="margin: 0; font-size: 18px; font-weight: 600;">COUNTA de Tipo_Riesgo</h4>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead style="background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border-bottom: 2px solid #e5e7eb;">
+                        <tr>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 40px;"></th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Tipo_Riesgo</th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; width: 40px;"></th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Problema_asociado</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 100px;">Año</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 100px;">Abierta</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 100px;">Cerrada</th>
+                            <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; width: 120px;">Suma total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    // Ordenar tipos de riesgo para la segunda tabla
+    const tiposRiesgoOrdenados2 = Object.keys(dataByTipoYProblema).sort();
+    
+    tiposRiesgoOrdenados2.forEach((tipoRiesgo, tipoIndex) => {
+        const tipoData = dataByTipoYProblema[tipoRiesgo];
+        const rowIdTipo = `detalle-tipo-${tipoIndex}`;
+        const rowStyle = tipoIndex % 2 === 0 ? 'background: #ffffff;' : 'background: #f9fafb;';
+        
+        // Fila principal del tipo de riesgo (expandible)
+        html += `
+            <tr style="${rowStyle} cursor: pointer;" onclick="toggleDetalleTipo('${rowIdTipo}')">
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                    <i id="icon-${rowIdTipo}" class="fa-solid fa-caret-right" style="color: #6b7280; transition: transform 0.2s;"></i>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1f2937;">${tipoRiesgo}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${tipoData.totalAbierta}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${tipoData.totalCerrada}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${tipoData.totalGeneral}</td>
+            </tr>
+        `;
+        
+        // Problemas asociados (nivel 2 - también expandibles)
+        const problemas = Object.keys(tipoData.problemas).sort();
+        
+        problemas.forEach((problema, probIndex) => {
+            const problemaData = tipoData.problemas[problema];
+            const rowIdProblema = `${rowIdTipo}-prob-${probIndex}`;
+            
+            // Fila del problema (expandible para mostrar años)
+            html += `
+                <tr id="${rowIdTipo}-${probIndex}" style="display: none; ${rowStyle} cursor: pointer;" onclick="toggleDetalleProblema('${rowIdProblema}')">
+                    <td style="padding: 12px 12px 12px 40px; border-bottom: 1px solid #e5e7eb;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                        <i id="icon-${rowIdProblema}" class="fa-solid fa-caret-right" style="color: #6b7280; transition: transform 0.2s;"></i>
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500; color: #374151;">${problema}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 500;">${problemaData.totalAbierta}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 500;">${problemaData.totalCerrada}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 500;">${problemaData.totalGeneral}</td>
+                </tr>
+            `;
+            
+            // Años del problema (nivel 3 - filas individuales)
+            const years = Object.keys(problemaData.anos).sort((a, b) => {
+                if (a === 'Sin año') return 1;
+                if (b === 'Sin año') return -1;
+                return parseInt(a) - parseInt(b);
+            });
+            
+            years.forEach(ano => {
+                const anoData = problemaData.anos[ano];
+                
+                html += `
+                    <tr id="${rowIdProblema}-${ano}" style="display: none; ${rowStyle}">
+                        <td style="padding: 12px 12px 12px 60px; border-bottom: 1px solid #e5e7eb;"></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280;"></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; color: #4b5563;">${ano}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${anoData.abierta}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${anoData.cerrada}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${anoData.total}</td>
+                    </tr>
+                `;
+            });
+        });
+        
+        // Fila de total por tipo de riesgo
+        html += `
+            <tr style="background: #e5e7eb;">
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; font-weight: 700; color: #1f2937;">Total ${tipoRiesgo}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${tipoData.totalAbierta}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${tipoData.totalCerrada}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${tipoData.totalGeneral}</td>
+            </tr>
+        `;
+    });
+    
+    // Fila de suma total global
+    html += `
+                        <tr style="background: linear-gradient(135deg, #374151 0%, #1f2937 100%); color: white;">
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;"></td>
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;">Suma total</td>
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;"></td>
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;"></td>
+                            <td style="padding: 12px; font-weight: 700; border-top: 2px solid #4b5563;"></td>
+                            <td style="padding: 12px; text-align: center; font-weight: 700; border-top: 2px solid #4b5563;">${globalTotalAbierta}</td>
+                            <td style="padding: 12px; text-align: center; font-weight: 700; border-top: 2px solid #4b5563;">${globalTotalCerrada}</td>
+                            <td style="padding: 12px; text-align: center; font-weight: 700; border-top: 2px solid #4b5563;">${globalTotalGeneral}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    annualStatsContent.innerHTML = html;
+}
+
+// <CHANGE> Función para expandir/colapsar años en la tabla de % Gestión
+function toggleRiesgoDetalle(rowId) {
+    const icon = document.getElementById('icon-' + rowId);
+    const allRows = document.querySelectorAll('[id^="' + rowId + '-"]');
+    const directChildren = Array.from(allRows).filter(row => {
+        const id = row.id;
+        const afterPrefix = id.substring(rowId.length + 1);
+        return !afterPrefix.includes('-');
+    });
+    
+    if (icon.classList.contains('fa-caret-right')) {
+        icon.classList.remove('fa-caret-right');
+        icon.classList.add('fa-caret-down');
+        icon.style.transform = 'rotate(90deg)';
+        directChildren.forEach(row => row.style.display = '');
+    } else {
+        icon.classList.add('fa-caret-right');
+        icon.classList.remove('fa-caret-down');
+        icon.style.transform = 'rotate(0deg)';
+        directChildren.forEach(row => row.style.display = 'none');
+    }
+}
+
+// <CHANGE> Función para expandir/colapsar el tipo de riesgo en la tabla detallada (nivel 1)
+function toggleDetalleTipo(rowId) {
+    const icon = document.getElementById('icon-' + rowId);
+    const allRows = document.querySelectorAll('[id^="' + rowId + '-"]');
+    const directChildren = Array.from(allRows).filter(row => {
+        const id = row.id;
+        const afterPrefix = id.substring(rowId.length + 1);
+        return afterPrefix.match(/^\d+$/) !== null; // Solo hijos directos (prob-X)
+    });
+    
+    if (icon.classList.contains('fa-caret-right')) {
+        icon.classList.remove('fa-caret-right');
+        icon.classList.add('fa-caret-down');
+        icon.style.transform = 'rotate(90deg)';
+        directChildren.forEach(row => row.style.display = '');
+    } else {
+        icon.classList.add('fa-caret-right');
+        icon.classList.remove('fa-caret-down');
+        icon.style.transform = 'rotate(0deg)';
+        // Colapsar también los problemas abiertos
+        allRows.forEach(row => {
+            row.style.display = 'none';
+            // Resetear iconos de problemas
+            const probIcon = row.querySelector('[id^="icon-"]');
+            if (probIcon && probIcon.id !== 'icon-' + rowId) {
+                probIcon.classList.add('fa-caret-right');
+                probIcon.classList.remove('fa-caret-down');
+                probIcon.style.transform = 'rotate(0deg)';
+            }
+        });
+    }
+}
+
+// <CHANGE> Función para expandir/colapsar problemas en la tabla detallada (nivel 2)
+function toggleDetalleProblema(rowId) {
+    const icon = document.getElementById('icon-' + rowId);
+    const yearRows = document.querySelectorAll('[id^="' + rowId + '-"]');
+    
+    if (icon.classList.contains('fa-caret-right')) {
+        icon.classList.remove('fa-caret-right');
+        icon.classList.add('fa-caret-down');
+        icon.style.transform = 'rotate(90deg)';
+        yearRows.forEach(row => row.style.display = '');
+    } else {
+        icon.classList.add('fa-caret-right');
+        icon.classList.remove('fa-caret-down');
+        icon.style.transform = 'rotate(0deg)';
+        yearRows.forEach(row => row.style.display = 'none');
+    }
+}
+
+// Función para mostrar errores en el tab anual
+function showErrorInAnnualStats(message) {
+    const annualStatsContent = document.getElementById('annualStatsContent');
+    
+    if (!annualStatsContent) return;
+    
+    annualStatsContent.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #ef4444;">
+            <div style="margin-bottom: 16px;">
+                <i class="fa-solid fa-exclamation-triangle" style="font-size: 24px;"></i>
+            </div>
+            <div style="margin-bottom: 16px; font-weight: 600;">${message || 'Error al cargar las estadísticas'}</div>
+            <button onclick="loadRiesgoAnualStats()" style="
+                padding: 8px 24px;
+                background: linear-gradient(135deg, #0f307f 0%, #3b82f6 100%);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            ">
+                <i class="fa-solid fa-rotate"></i> Reintentar
+            </button>
+        </div>
+    `;
+}
+
+// Función para exportar estadísticas anuales
+function exportRiesgoAnualStats() {
+    google.script.run
+        .withSuccessHandler(function(result) {
+            if (result.success) {
+                const csvContent = result.csv;
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                
+                if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", `estadisticas_riesgo_anual_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                
+                showAlert('success', 'Exportado', 'Estadísticas exportadas correctamente');
+            } else {
+                showAlert('error', 'Error', 'No se pudo exportar las estadísticas');
+            }
+        })
+        .withFailureHandler(function(error) {
+            showAlert('error', 'Error', 'Error al exportar: ' + error.message);
+        })
+        .exportRiesgoAnualStatsToCSV('todos');
 }
 
 </script>

@@ -602,6 +602,47 @@ function createReportCard(report) {
     return card;
 }
 
+function expandImage(url) {
+  console.log("🔍 Expandir imagen:", url.substring(0, 50) + "...");
+  
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100vw';
+  modal.style.height = '100vh';
+  modal.style.background = 'rgba(0,0,0,0.9)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.cursor = 'pointer';
+  modal.style.zIndex = '9999';
+  
+  const imgElement = document.createElement('img');
+  imgElement.src = url;
+  imgElement.style.maxWidth = '90%';
+  imgElement.style.maxHeight = '90%';
+  imgElement.style.borderRadius = '8px';
+  imgElement.style.objectFit = 'contain';
+  
+  modal.appendChild(imgElement);
+  modal.onclick = () => {
+    console.log("❌ Cerrar modal de imagen");
+    modal.remove();
+  };
+  
+  document.body.appendChild(modal);
+  
+  // También cerrar con ESC
+  const closeOnEsc = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', closeOnEsc);
+    }
+  };
+  document.addEventListener('keydown', closeOnEsc);
+}
+
 // Inicializar dropzone para N2
 function initializeN2Dropzone() {
     const dropZoneN2 = document.getElementById('dropZoneN2');
@@ -1900,67 +1941,63 @@ function showTarjetasLoadingSpinner() {
     });
 }
 
-/**
- * Muestra las tarjetas separadas por estado
- */
 function displayTarjetasReports(tarjetas) {
-    console.log('[v0] Mostrando tarjetas:', tarjetas.length);
-    
-    if (!Array.isArray(tarjetas)) {
-        tarjetas = [];
-    }
+  console.log('[v0] Mostrando tarjetas (con hipervínculos):', tarjetas.length);
+  
+  if (!Array.isArray(tarjetas)) {
+    tarjetas = [];
+  }
 
-    // Guardar tarjetas globalmente
-    tarjetasReports = tarjetas;
+  // Guardar tarjetas globalmente
+  tarjetasReports = tarjetas;
 
-    // Limpiar contenedores
-    const abiertasContainer = document.getElementById('abiertas-cards');
-    const cerradasContainer = document.getElementById('cerradas-cards');
-    
-    if (abiertasContainer) abiertasContainer.innerHTML = '';
-    if (cerradasContainer) cerradasContainer.innerHTML = '';
+  // Limpiar contenedores
+  const abiertasContainer = document.getElementById('abiertas-cards');
+  const cerradasContainer = document.getElementById('cerradas-cards');
+  
+  if (abiertasContainer) abiertasContainer.innerHTML = '';
+  if (cerradasContainer) cerradasContainer.innerHTML = '';
 
-    // Separar por estado
-    const abiertas = tarjetas.filter(t => t.estado !== 'Cerrada');
-    const cerradas = tarjetas.filter(t => t.estado === 'Cerrada');
+  // Separar por estado
+  const abiertas = tarjetas.filter(t => t.estado !== 'Cerrada');
+  const cerradas = tarjetas.filter(t => t.estado === 'Cerrada');
 
-    // Actualizar contadores
-    const abiertasCount = document.getElementById('abiertas-count');
-    const cerradasCount = document.getElementById('cerradas-count');
-    
-    if (abiertasCount) abiertasCount.textContent = abiertas.length;
-    if (cerradasCount) cerradasCount.textContent = cerradas.length;
+  // Actualizar contadores
+  const abiertasCount = document.getElementById('abiertas-count');
+  const cerradasCount = document.getElementById('cerradas-count');
+  
+  if (abiertasCount) abiertasCount.textContent = abiertas.length;
+  if (cerradasCount) cerradasCount.textContent = cerradas.length;
 
-    // Mostrar tarjetas abiertas
-    if (abiertas.length === 0 && abiertasContainer) {
-        abiertasContainer.innerHTML = `
-            <div class="empty-column">
-                <span>No hay tarjetas abiertas</span>
-            </div>
-        `;
-    } else {
-        abiertas.forEach(tarjeta => {
-            if (abiertasContainer) {
-                abiertasContainer.appendChild(createTarjetaCard(tarjeta, false));
-            }
-        });
-    }
+  // Mostrar tarjetas abiertas CON HIPERVÍNCULOS
+  if (abiertas.length === 0 && abiertasContainer) {
+    abiertasContainer.innerHTML = `
+      <div class="empty-column">
+        <span>No hay tarjetas abiertas</span>
+      </div>
+    `;
+  } else {
+    abiertas.forEach(tarjeta => {
+      if (abiertasContainer) {
+        abiertasContainer.appendChild(createTarjetaCard(tarjeta, false));
+      }
+    });
+  }
 
-    // Mostrar tarjetas cerradas
-    if (cerradas.length === 0 && cerradasContainer) {
-        cerradasContainer.innerHTML = `
-            <div class="empty-column">
-                <span>No hay tarjetas cerradas</span>
-            </div>
-        `;
-    } else {
-        cerradas.forEach(tarjeta => {
-            if (cerradasContainer) {
-                cerradasContainer.appendChild(createTarjetaCard(tarjeta, true));
-            }
-        });
-    }
-    
+  // Mostrar tarjetas cerradas CON HIPERVÍNCULOS
+  if (cerradas.length === 0 && cerradasContainer) {
+    cerradasContainer.innerHTML = `
+      <div class="empty-column">
+        <span>No hay tarjetas cerradas</span>
+      </div>
+    `;
+  } else {
+    cerradas.forEach(tarjeta => {
+      if (cerradasContainer) {
+        cerradasContainer.appendChild(createTarjetaCard(tarjeta, true));
+      }
+    });
+  }
 }
 
 function createTarjetaCard(tarjeta, isCerrada) {
@@ -2024,7 +2061,7 @@ const editButtonHtml = !isCerrada ? `
         <span class="comment-count" id="comment-count-tar-${tarjeta.id}" style="color:black; border-radius:8px; padding:2px 6px; font-size:10px; margin-left:8px;">0</span>
     </div>
 
-    <div class="card-images" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;"></div>
+    <div class="card-images" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
 
     <div class="card-footer" 
          style="margin-top:8px;padding-top:8px;border-top:1px solid #e9ecef;font-size:12px;color:#6c757d;">
@@ -2064,86 +2101,88 @@ const editButtonHtml = !isCerrada ? `
     </div>
   `;
 
-  // 🔹 Insertar imágenes
-  const imagesContainer = card.querySelector('.card-images');
+const imagesContainer = card.querySelector('.card-images');
 
   if (tarjeta.fotos && tarjeta.fotos.length > 0) {
-    tarjeta.fotos.forEach((foto, i) => {
-      const img = document.createElement('img');
-      img.alt = `Foto ${i + 1}`;
-      img.className = 'card-img-thumb';
+    // Contenedor de lista
+    const listContainer = document.createElement('div');
+    listContainer.className = 'photo-links-list';
+    
+    // Header con contador
+    const listHeader = document.createElement('div');
+    listHeader.style.cssText = `
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #6c757d;
+    `;
+    listHeader.innerHTML = `
+      <span class="photos-list-count">
+        <i class="fas fa-images"></i>
+        ${tarjeta.fotos.length} imagen(es)
+      </span>
+      <span style="font-size: 11px; color: #adb5bd;">
+        Click en el enlace para ver una imagen
+      </span>
+    `;
+    listContainer.appendChild(listHeader);
 
-      if (foto.startsWith('data:image')) {
-        img.src = foto;
-      } else if (foto.includes('drive.google.com')) {
-        const match = foto.match(/id=([a-zA-Z0-9_-]+)/);
-        img.src = match ? `https://drive.google.com/uc?export=view&id=${match[1]}` : foto;
-      } else {
-        img.src = foto;
+    // Crear lista de links
+    tarjeta.fotos.forEach((url, i) => {
+      if (typeof url === 'string' && url.trim() !== '') {
+        const linkItem = document.createElement('a');
+        linkItem.href = url;
+        linkItem.target = '_blank';
+        linkItem.rel = 'noopener noreferrer';
+        linkItem.className = 'photo-link-item';
+        linkItem.title = `Ver imagen ${i + 1} en tamaño completo (Se abrirá en nueva pestaña)`;
+        
+        // Extraer nombre del archivo de la URL si es posible
+        let fileName = `Imagen ${i + 1}`;
+        try {
+          const urlObj = new URL(url);
+          const pathParts = urlObj.pathname.split('/');
+          const lastPart = pathParts[pathParts.length - 1];
+          if (lastPart && lastPart.includes('.')) {
+            fileName = lastPart.split('?')[0];
+          }
+        } catch (e) {
+          // Si no es URL válida, mantener nombre por defecto
+        }
+        
+        linkItem.innerHTML = `
+          <div class="photo-link-icon">
+            <i class="fas fa-file-image"></i>
+          </div>
+          <div class="photo-link-text">
+            ${fileName}
+          </div>
+          <div class="photo-link-size">
+            Foto ${i + 1}
+          </div>
+          <div class="photo-link-external">
+            <i class="fas fa-external-link-alt"></i>
+          </div>
+        `;
+        
+        listContainer.appendChild(linkItem);
       }
-
-      img.style.cssText = `
-        width:70px;
-        height:70px;
-        margin:10px 0;
-        object-fit:cover;
-        border-radius:8px;
-        border:1px solid #ccc;
-        cursor:pointer;
-        transition:transform 0.2s ease;
-      `;
-
-      img.addEventListener('mouseover', () => img.style.transform = 'scale(1.1)');
-      img.addEventListener('mouseout', () => img.style.transform = 'scale(1)');
-      img.addEventListener('click', () => expandImage(img.src));
-
-      imagesContainer.appendChild(img);
     });
+    
+    imagesContainer.appendChild(listContainer);
+    
+  } else {
+    // Cuando no hay fotos
+    imagesContainer.innerHTML = `
+      <div class="no-photos-list">
+        <i class="far fa-image"></i>
+        No hay imágenes adjuntas a esta tarjeta
+      </div>
+    `;
   }
 
   return card;
-}
-
-// Función para ampliar imagen al hacer click
-function expandImage(url) {
-  console.log("🔍 Expandir imagen:", url.substring(0, 50) + "...");
-  
-  const modal = document.createElement('div');
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.width = '100vw';
-  modal.style.height = '100vh';
-  modal.style.background = 'rgba(0,0,0,0.9)';
-  modal.style.display = 'flex';
-  modal.style.alignItems = 'center';
-  modal.style.justifyContent = 'center';
-  modal.style.cursor = 'pointer';
-  modal.style.zIndex = '9999';
-  
-  const imgElement = document.createElement('img');
-  imgElement.src = url;
-  imgElement.style.maxWidth = '90%';
-  imgElement.style.maxHeight = '90%';
-  imgElement.style.borderRadius = '8px';
-  imgElement.style.objectFit = 'contain';
-  
-  modal.appendChild(imgElement);
-  modal.onclick = () => {
-    console.log("❌ Cerrar modal de imagen");
-    modal.remove();
-  };
-  
-  document.body.appendChild(modal);
-  
-  // También cerrar con ESC
-  const closeOnEsc = (e) => {
-    if (e.key === 'Escape') {
-      modal.remove();
-      document.removeEventListener('keydown', closeOnEsc);
-    }
-  };
-  document.addEventListener('keydown', closeOnEsc);
 }
 
 /**
@@ -6077,22 +6116,46 @@ function cargarContadorInicial(idCausa, cicloId) {
 }
 
 function mostrarAccionesCausa(idCausa, nombreCausa) {
+  console.log('🔍 DEBUG mostrarAccionesCausa - INICIO');
+  console.log('ID Causa recibido:', idCausa);
+  console.log('Nombre Causa recibido:', nombreCausa);
+  console.log('window.causaActual ANTES:', window.causaActual);
+  console.log('accionCausaActual ANTES:', accionCausaActual);
+  console.log('cicloActual:', cicloActual);
+  
   try {
-    console.log('Mostrar acciones - ID Causa:', idCausa, 'Nombre:', nombreCausa);
-    
+    // Validaciones más robustas
     if (!cicloActual) {
-      showAlert('error', 'Error', 'No hay un ciclo cargado');
+      console.error('❌ ERROR: cicloActual no está definido');
+      showAlert('error', 'Error', 'No hay un ciclo cargado. Vuelve a abrir el ciclo.');
       return;
     }
     
-    // ✅ CORRECCIÓN: Guardar referencia globalmente
-    accionCausaActual = {
+    // 🔹 CORRECCIÓN: Asegurar que los datos se guarden GLOBALMENTE
+        const causaData = {
       id: parseInt(idCausa),
       nombre: nombreCausa,
       cicloId: cicloActual.id,
-      causaIndex: parseInt(idCausa), // Guardar también el índice para seguimiento
-      causaTexto: nombreCausa
+      causaIndex: parseInt(idCausa),
+      causaTexto: nombreCausa,
+      timestamp: new Date().getTime()
     };
+    
+    // 1. Guardar en variable global
+    window.causaActual = causaData;
+    
+    // 2. Guardar en variable del script
+    accionCausaActual = causaData;
+    
+    // 3. Guardar en localStorage como backup
+    localStorage.setItem('ultimaCausaSeleccionada', JSON.stringify(causaData));
+    
+    // 4. Guardar en sessionStorage también
+    sessionStorage.setItem('causaActual', JSON.stringify(causaData));
+    
+    console.log('✅ Causa guardada en todos los lugares:', causaData);
+    console.log('✅ Datos guardados en window.causaActual:', window.causaActual);
+    console.log('✅ Datos guardados en accionCausaActual:', accionCausaActual);
         
         // Crear el modal si no existe
         crearModalAccionesCausa();
@@ -6384,33 +6447,29 @@ function crearModalAccionesCausa() {
     }, 50); // Aumentado a 50ms para dar tiempo al DOM
 }
 
-// Cerrar modal de acciones - VERSIÓN MÁS ROBUSTA
 function cerrarModalAccionesCausa() {
-    const modal = document.getElementById('modalAccionesCausa');
-    if (modal) {
-        modal.classList.remove('active');
-        console.log('Modal cerrado');
-    } else {
-        console.warn('Modal no encontrado al intentar cerrar');
+  const modal = document.getElementById('modalAccionesCausa');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+  
+  document.body.style.overflow = '';
+
+  // Limpiar formulario
+  const elementosFormulario = [
+    {id: 'nuevaAccionQue', defaultValue: ''},
+    {id: 'nuevaAccionDonde', defaultValue: ''},
+    {id: 'nuevaAccionComo', defaultValue: ''},
+    {id: 'nuevaAccionCuando', defaultValue: ''},
+    {id: 'nuevaAccionCuanto', defaultValue: ''}
+  ];
+  
+  elementosFormulario.forEach(item => {
+    const elemento = document.getElementById(item.id);
+    if (elemento) {
+      elemento.value = item.defaultValue;
     }
-    
-    document.body.style.overflow = '';
-    window.causaActual = null;
-    
-    // Limpiar formulario
-    const elementosFormulario = [
-        {id: 'nuevaAccionDescripcion', defaultValue: ''},
-        {id: 'nuevaAccionResponsable', defaultValue: currentUser ? currentUser.nombre || '' : ''},
-        {id: 'nuevaAccionFechaLimite', defaultValue: ''},
-        {id: 'nuevaAccionEstado', defaultValue: 'pendiente'}
-    ];
-    
-    elementosFormulario.forEach(item => {
-        const elemento = document.getElementById(item.id);
-        if (elemento) {
-            elemento.value = item.defaultValue;
-        }
-    });
+  });
 }
 
 
@@ -6677,93 +6736,119 @@ function formatearFechaCorta(fecha) {
 }
 
 function guardarAccionCausa() {
-    if (!window.causaActual) {
-        showAlert('error', 'Error', 'No hay causa seleccionada');
-        return;
+  console.log('🔍 DEBUG guardarAccionCausa - INICIO');
+  console.log('window.causaActual:', window.causaActual);
+  console.log('accionCausaActual:', accionCausaActual);
+  console.log('cicloActual:', cicloActual);
+  
+  // 🔹 CORRECCIÓN: Verificar AMBAS variables
+  let causaSeleccionada = window.causaActual || accionCausaActual;
+  
+  if (!causaSeleccionada) {
+    console.error('❌ ERROR: No se encontró causa seleccionada');
+    console.log('Buscando en localStorage...');
+    
+    // Intentar recuperar del localStorage
+    const savedCausa = localStorage.getItem('ultimaCausaSeleccionada');
+    if (savedCausa) {
+      try {
+        causaSeleccionada = JSON.parse(savedCausa);
+        console.log('✅ Causa recuperada de localStorage:', causaSeleccionada);
+      } catch (e) {
+        console.error('Error parseando localStorage:', e);
+      }
     }
     
-    // Obtener todos los valores del formulario
-    const que = document.getElementById('nuevaAccionQue').value.trim();
-    const donde = document.getElementById('nuevaAccionDonde').value.trim();
-    const quien = document.getElementById('nuevaAccionQuien').value.trim();
-    const como = document.getElementById('nuevaAccionComo').value.trim();
-    const cuando = document.getElementById('nuevaAccionCuando').value;
-    const cuanto = document.getElementById('nuevaAccionCuanto').value.trim();
-    const estado = document.getElementById('nuevaAccionEstado').value;
-    
-    // Validaciones
-    if (!que) {
-        showAlert('warning', 'Campo requerido', 'El campo QUÉ (Descripción) es obligatorio');
-        document.getElementById('nuevaAccionQue').focus();
-        return;
+    if (!causaSeleccionada) {
+      showAlert('error', 'Error', 'No hay causa seleccionada. Por favor, selecciona una causa primero.');
+      return;
     }
-    
-    if (!quien) {
-        showAlert('warning', 'Campo requerido', 'El campo QUIÉN (Responsable) es obligatorio');
-        document.getElementById('nuevaAccionQuien').focus();
-        return;
-    }
-    
-    const btn = document.querySelector('.btn-primary');
-    const originalText = btn.textContent;
-    btn.disabled = true;
-    btn.innerHTML = '<svg class="spinner-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg> Guardando...';
-    
-    const accionData = {
-        cicloId: window.causaActual.cicloId,
-        idCausa: window.causaActual.id,
-        que: que,           // QUÉ
-        donde: donde,       // DÓNDE
-        quien: quien,       // QUIÉN
-        como: como,         // CÓMO
-        cuando: cuando,     // CUÁNDO
-        cuanto: cuanto,     // CUÁNTO
-        estado: estado,     // Estado
-        autor: currentUser ? currentUser.nombre : 'Usuario',
-        fechaCreacion: new Date().toISOString()
-    };
-    
-    console.log('Enviando datos de acción 5W+2H:', accionData);
-    
-    google.script.run
-        .withSuccessHandler(function(result) {
-            console.log('Respuesta del backend:', result);
-            
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-            
-            if (result.success) {
-                showAlert('success', 'Éxito', 'Acción 5W+2H guardada correctamente');
-                
-                // Limpiar formulario
-                document.getElementById('nuevaAccionQue').value = '';
-                document.getElementById('nuevaAccionDonde').value = '';
-                document.getElementById('nuevaAccionComo').value = '';
-                document.getElementById('nuevaAccionCuando').value = '';
-                document.getElementById('nuevaAccionCuanto').value = '';
-                document.getElementById('nuevaAccionEstado').value = 'pendiente';
-                
-                // Auto-completar responsable
-                if (currentUser) {
-                    document.getElementById('nuevaAccionQuien').value = currentUser.nombre || '';
-                }
-                
-                // Recargar lista
-                cargarAccionesCausa(window.causaActual.id);
-                
-                // Actualizar contador en tabla
-                actualizarContadorAcciones(window.causaActual.id);
-            } else {
-                showAlert('error', 'Error', result.message || 'No se pudo guardar la acción');
-            }
-        })
-        .withFailureHandler(function(error) {
-            console.error('Error en guardarAccionCausa:', error);
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-            showAlert('error', 'Error', 'Error al guardar: ' + (error.message || error));
-        })
-        .guardarAccionCausa(accionData);
+  }
+  
+  // Obtener todos los valores del formulario
+  const que = document.getElementById('nuevaAccionQue')?.value.trim();
+  const donde = document.getElementById('nuevaAccionDonde')?.value.trim();
+  const quien = document.getElementById('nuevaAccionQuien')?.value.trim();
+  const como = document.getElementById('nuevaAccionComo')?.value.trim();
+  const cuando = document.getElementById('nuevaAccionCuando')?.value;
+  const cuanto = document.getElementById('nuevaAccionCuanto')?.value.trim();
+  const estado = document.getElementById('nuevaAccionEstado')?.value;
+  
+  console.log('📋 Datos del formulario:', { que, donde, quien, como, cuando, cuanto, estado });
+  
+  // Validaciones
+  if (!que) {
+    showAlert('warning', 'Campo requerido', 'El campo QUÉ (Descripción) es obligatorio');
+    document.getElementById('nuevaAccionQue')?.focus();
+    return;
+  }
+  
+  if (!quien) {
+    showAlert('warning', 'Campo requerido', 'El campo QUIÉN (Responsable) es obligatorio');
+    document.getElementById('nuevaAccionQuien')?.focus();
+    return;
+  }
+  
+  const btn = document.querySelector('.btn-primary');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<svg class="spinner-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg> Guardando...';
+  
+  const accionData = {
+    cicloId: causaSeleccionada.cicloId,
+    idCausa: causaSeleccionada.id,
+    que: que,
+    donde: donde,
+    quien: quien,
+    como: como,
+    cuando: cuando,
+    cuanto: cuanto,
+    estado: estado,
+    autor: currentUser ? currentUser.nombre : 'Usuario',
+    fechaCreacion: new Date().toISOString()
+  };
+  
+  console.log('📤 Enviando datos al backend:', accionData);
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      console.log('✅ Respuesta del backend:', result);
+      
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+      
+      if (result.success) {
+        showAlert('success', 'Éxito', 'Acción 5W+2H guardada correctamente');
+        
+        // Limpiar formulario
+        document.getElementById('nuevaAccionQue').value = '';
+        document.getElementById('nuevaAccionDonde').value = '';
+        document.getElementById('nuevaAccionComo').value = '';
+        document.getElementById('nuevaAccionCuando').value = '';
+        document.getElementById('nuevaAccionCuanto').value = '';
+        document.getElementById('nuevaAccionEstado').value = 'pendiente';
+        
+        // Auto-completar responsable
+        if (currentUser) {
+          document.getElementById('nuevaAccionQuien').value = currentUser.nombre || '';
+        }
+        
+        // Recargar lista
+        cargarAccionesCausa(causaSeleccionada.id);
+        
+        // Actualizar contador en tabla
+        actualizarContadorAcciones(causaSeleccionada.id);
+      } else {
+        showAlert('error', 'Error', result.message || 'No se pudo guardar la acción');
+      }
+    })
+    .withFailureHandler(function(error) {
+      console.error('❌ Error en guardarAccionCausa:', error);
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+      showAlert('error', 'Error', 'Error al guardar: ' + (error.message || error));
+    })
+    .guardarAccionCausa(accionData);
 }
 
 // Eliminar acción

@@ -969,27 +969,22 @@ function getTarjetasReports() {
       if (!row || row.length === 0 || !row[0]) continue;
 
       // Convertir fotos de Drive a Base64
-      let fotosBase64 = [];
-      if (row[12]) { // Columna 13: fotos
+      let fotosUrls = [];
+      if (row[12]) { // Columna 13: fotos (JSON con URLs)
         try {
-          const urls = JSON.parse(row[12]);
-          if (Array.isArray(urls)) {
-            fotosBase64 = urls.map(url => {
-              try {
-                const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/);
-                if (!idMatch) return '';
-                const file = DriveApp.getFileById(idMatch[1]);
-                const blob = file.getBlob();
-                return "data:" + blob.getContentType() + ";base64," + Utilities.base64Encode(blob.getBytes());
-              } catch (e) {
-                console.error('Error procesando foto:', e);
-                return '';
-              }
-            }).filter(foto => foto !== '');
+          // Parsear JSON de URLs
+          fotosUrls = JSON.parse(row[12]);
+          
+          // Asegurar que sea array
+          if (!Array.isArray(fotosUrls)) {
+            fotosUrls = [];
           }
+          
+          console.log(`Fila ${i+1}: ${fotosUrls.length} URLs de fotos`);
+          
         } catch (e) {
-          console.error('Error parseando JSON de fotos:', e);
-          fotosBase64 = [];
+          console.error('Error parseando JSON de fotos (fila ' + i + '):', e);
+          fotosUrls = [];
         }
       }
 
@@ -1057,7 +1052,7 @@ function getTarjetasReports() {
         generadaPor: row[9] || "",
         fechaCreacion: fechaCreacion,
         estado: row[11] || "Abierta",
-        fotos: fotosBase64,
+        fotos: fotosUrls,
         comentarioCierre: row[13] || "",
         responsableCierre: row[14] || "",
         requiereSAP: row[15] || "No",

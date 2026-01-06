@@ -892,3 +892,299 @@ function exportLiderSolucionStatsToCSV() {
     return { success: false, message: error.toString() };
   }
 }
+
+// Función para obtener años disponibles
+function getAvailableYearsForStats() {
+  try {
+    const ss = SpreadsheetApp.openById('1QIUKYX42uuMlsssR-0CizPI-lJwDS6xH760kg9uYDII');
+    const sheet = ss.getSheetByName('Reportes_Tarjetas'); 
+    
+    if (!sheet) {
+      return { success: false, message: 'Hoja no encontrada' };
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    // Encontrar índice de columna de fecha
+    const fechaIndex = headers.indexOf('Fecha_Creacion');
+    
+    if (fechaIndex === -1) {
+      return { success: false, message: 'Columna de fecha no encontrada' };
+    }
+    
+    const yearsSet = new Set();
+    
+    // Recorrer datos para extraer años
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const fechaStr = row[fechaIndex];
+      
+      if (fechaStr) {
+        let fecha;
+        try {
+          fecha = new Date(fechaStr);
+        } catch (e) {
+          continue;
+        }
+        
+        if (fecha && !isNaN(fecha.getTime())) {
+          const year = fecha.getFullYear();
+          yearsSet.add(year.toString());
+        }
+      }
+    }
+    
+    const years = Array.from(yearsSet).sort((a, b) => b - a); // Orden descendente
+    
+    return {
+      success: true,
+      years: years
+    };
+    
+  } catch (error) {
+    console.error('Error en getAvailableYearsForStats:', error);
+    return { success: false, message: error.toString() };
+  }
+}
+
+// Versión mejorada que maneja registros sin fecha
+function getRiesgoAnualStats(year) {
+  try {
+    const ss = SpreadsheetApp.openById('1QIUKYX42uuMlsssR-0CizPI-lJwDS6xH760kg9uYDII');
+    const sheet = ss.getSheetByName('Reportes_Tarjetas'); 
+    
+    if (!sheet) {
+      return { success: false, message: 'Hoja no encontrada' };
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    // Encontrar índices de columnas
+    const fechaIndex = headers.indexOf('Fecha_Creacion');
+    const tipoRiesgoIndex = headers.indexOf('Tipo_Riesgo');
+    const problemaIndex = headers.indexOf('Problema_asociado');
+    const estadoIndex = headers.indexOf('estado');
+    
+    if (fechaIndex === -1 || tipoRiesgoIndex === -1 || problemaIndex === -1 || estadoIndex === -1) {
+      return { success: false, message: 'Columnas requeridas no encontradas' };
+    }
+    
+    // Estructura para almacenar estadísticas
+    const stats = {};
+    
+    // Variables para totales
+    let totalGlobalAbierta = 0;
+    let totalGlobalCerrada = 0;
+    let totalGlobal = 0;
+    
+    // Procesar datos
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const fechaStr = row[fechaIndex];
+      const tipoRiesgo = row[tipoRiesgoIndex] || 'Sin tipo';
+      const problema = row[problemaIndex] || 'Sin problema';
+      const estado = row[estadoIndex] || 'Sin estado';
+      
+      // Obtener año de la fecha
+      let rowYear = "Sin año";
+      if (fechaStr) {
+        try {
+          const fecha = new Date(fechaStr);
+          if (fecha && !isNaN(fecha.getTime())) {
+            rowYear = fecha.getFullYear().toString();
+          }
+        } catch (e) {
+          // Si hay error, mantener "Sin año"
+        }
+      }
+      
+      // Filtrar por año si no es "todos"
+      if (year !== "todos" && rowYear !== year) {
+        continue;
+      }
+      
+      const key = `${rowYear}|${tipoRiesgo}|${problema}`;
+      
+      // Inicializar estructura si no existe
+      if (!stats[rowYear]) {
+        stats[rowYear] = {};
+      }
+      
+      if (!stats[rowYear][tipoRiesgo]) {
+        stats[rowYear][tipoRiesgo] = {
+          problemas: {},
+          totalAbierta: 0,
+          totalCerrada: 0,
+          totalGeneral: 0
+        };
+      }
+      
+      if (!stats[rowYear][tipoRiesgo].problemas[problema]) {
+        stats[rowYear][tipoRiesgo].problemas[problema] = {
+          abierta: 0,
+          cerrada: 0,
+          total: 0
+        };
+      }
+      
+      // Contar por estado
+      if (estado === 'Abierta' || estado === 'Abierto') {
+        stats[rowYear][tipoRiesgo].problemas[problema].abierta++;
+        stats[rowYear][tipoRiesgo].totalAbierta++;
+        totalGlobalAbierta++;
+      } else if (estado === 'Cerrada' || estado === 'Cerrado') {
+        stats[rowYear][tipoRiesgo].problemas[problema].cerrada++;
+        stats[rowYear][tipoRiesgo].totalCerrada++;
+        totalGlobalCerrada++;
+      }
+      
+      stats[rowYear][tipoRiesgo].problemas[problema].total++;
+      stats[rowYear][tipoRiesgo].totalGeneral++;
+      totalGlobal++;
+    }
+    
+    // Preparar datos para tabla
+    const tableData = [];
+    
+    // Obtener años ordenados (más reciente primero, "Sin año" al final)
+    const years = Object.keys(stats).sort((a, b) => {
+      if (a === "Sin año") return 1;
+      if (b === "Sin año") return -1;
+      return b - a;
+    });
+    
+    years.forEach(ano => {
+      const tiposRiesgo = Object.keys(stats[ano]).sort();
+      
+      tiposRiesgo.forEach(tipoRiesgo => {
+        const tipoData = stats[ano][tipoRiesgo];
+        
+        // Agregar filas para cada problema
+        Object.keys(tipoData.problemas).sort().forEach(problema => {
+          const probData = tipoData.problemas[problema];
+          const porcentaje = probData.total > 0 ? 
+            ((probData.cerrada / probData.total) * 100).toFixed(2) : '0.00';
+          
+          tableData.push({
+            ano: ano,
+            tipoRiesgo: tipoRiesgo,
+            problema: problema,
+            abierta: probData.abierta,
+            cerrada: probData.cerrada,
+            total: probData.total,
+            porcentaje: porcentaje + '%'
+          });
+        });
+        
+        // Agregar subtotal por tipo de riesgo en el año
+        const tipoPorcentaje = tipoData.totalGeneral > 0 ? 
+          ((tipoData.totalCerrada / tipoData.totalGeneral) * 100).toFixed(2) : '0.00';
+        
+        tableData.push({
+          ano: ano,
+          tipoRiesgo: tipoRiesgo,
+          problema: 'Total ' + tipoRiesgo,
+          abierta: tipoData.totalAbierta,
+          cerrada: tipoData.totalCerrada,
+          total: tipoData.totalGeneral,
+          porcentaje: tipoPorcentaje + '%',
+          isRiesgoTotal: true
+        });
+      });
+      
+      // Calcular total por año
+      let anoAbierta = 0;
+      let anoCerrada = 0;
+      let anoTotal = 0;
+      
+      tiposRiesgo.forEach(tipoRiesgo => {
+        const tipoData = stats[ano][tipoRiesgo];
+        anoAbierta += tipoData.totalAbierta;
+        anoCerrada += tipoData.totalCerrada;
+        anoTotal += tipoData.totalGeneral;
+      });
+      
+      const anoPorcentaje = anoTotal > 0 ? 
+        ((anoCerrada / anoTotal) * 100).toFixed(2) : '0.00';
+      
+      // Agregar total por año
+      tableData.push({
+        ano: ano,
+        tipoRiesgo: 'TOTAL AÑO',
+        problema: '',
+        abierta: anoAbierta,
+        cerrada: anoCerrada,
+        total: anoTotal,
+        porcentaje: anoPorcentaje + '%',
+        isYearTotal: true
+      });
+    });
+    
+    // Agregar total global (solo si es "todos" o hay un solo año)
+    if (year === "todos" || years.length > 0) {
+      const globalPorcentaje = totalGlobal > 0 ? 
+        ((totalGlobalCerrada / totalGlobal) * 100).toFixed(2) : '0.00';
+      
+      tableData.push({
+        ano: '',
+        tipoRiesgo: 'TOTAL GENERAL',
+        problema: '',
+        abierta: totalGlobalAbierta,
+        cerrada: totalGlobalCerrada,
+        total: totalGlobal,
+        porcentaje: globalPorcentaje + '%',
+        isGlobalTotal: true
+      });
+    }
+    
+    return {
+      success: true,
+      data: tableData,
+      summary: {
+        totalTarjetas: totalGlobal,
+        abiertas: totalGlobalAbierta,
+        cerradas: totalGlobalCerrada,
+        porcentajeGestion: totalGlobal > 0 ? 
+          ((totalGlobalCerrada / totalGlobal) * 100).toFixed(2) : '0.00'
+      }
+    };
+    
+  } catch (error) {
+    console.error('Error en getRiesgoAnualStats:', error);
+    return { success: false, message: error.toString() };
+  }
+}
+
+// Función para exportar estadísticas de riesgo anual a CSV
+function exportRiesgoAnualStatsToCSV(year) {
+  try {
+    const stats = getRiesgoAnualStats(year);
+    
+    if (!stats.success) {
+      return { success: false, message: stats.message };
+    }
+    
+    // Crear contenido CSV
+    let csvContent = "Año,Tipo de Riesgo,Problema Asociado,Abierta,Cerrada,Suma total,% Gestión\n";
+    
+    stats.data.forEach(row => {
+      const ano = (row.ano || '').replace(/"/g, '""');
+      const tipoRiesgo = (row.tipoRiesgo || '').replace(/"/g, '""');
+      const problema = (row.problema || '').replace(/"/g, '""');
+      const porcentaje = (row.porcentaje || '0.00%').replace(',', '.');
+      
+      csvContent += `"${ano}","${tipoRiesgo}","${problema}",${row.abierta || 0},${row.cerrada || 0},${row.total || 0},"${porcentaje}"\n`;
+    });
+    
+    return {
+      success: true,
+      csv: csvContent
+    };
+    
+  } catch (error) {
+    console.error('Error en exportRiesgoAnualStatsToCSV:', error);
+    return { success: false, message: error.toString() };
+  }
+}

@@ -340,12 +340,15 @@
                                             <option value="Logística - Materias Primas">Logística - Materias Primas</option>
                                             <option value="Logistica - Almacen General">Logistica - Almacen General</option>
                                             <option value="Manufactura - Molino">Manufactura - Molino</option>
+                                            <option value="Manufactura - Pastificio">Manufactura - Pastificio</option>
+                                            <option value="Manufactura - Empaque">Manufactura - Empaque</option>
                                             <option value="Manufactura - Pastificio A">Manufactura - Pastificio A</option>
                                             <option value="Manufactura - Pastificio B">Manufactura - Pastificio B</option>
                                             <option value="Manufactura - Pastificio C">Manufactura - Pastificio C</option>
                                             <option value="Manufactura - Pastificio D">Manufactura - Pastificio D</option>
                                             <option value="Manufactura - Pastificio Lavamoldes">Manufactura - Lavamoldes</option>
                                             <option value="Manufactura - Empaque Pasta Larga">Manufactura - Empaque Pasta Larga</option>
+                                            <option value="Manufactura - Empaque Pasta Corta">Manufactura - Empaque Pasta Corta</option>
                                             <option value="Manufactura - Empaque MQ 02">Manufactura - Empaque MQ 02</option>
                                             <option value="Manufactura - Empaque MQ 03">Manufactura - Empaque MQ 03</option>
                                             <option value="Manufactura - Empaque MQ 04">Manufactura - Empaque MQ 04</option>
@@ -1229,7 +1232,6 @@
                             </svg>
                             
                         </button>
-                        <label for="ProcessFilter"></label>
                         <select id="ProcessFilter" onchange="applyCombinedFilters()">
                               <option value="allProcess">Todos los procesos</option>
                               <option value="ProcessEmpaque">Empaque</option>
@@ -1240,7 +1242,6 @@
                               <option value="ProcessAlmacenes">Almacenes Gral. y MP</option>
                           </select>
 
-                        <label for="ProcessRespo"></label>
                         <select id="ProcessRespo" onchange="applyCombinedFilters()">
                               <option value="all">Todos los procesos res.</option>
                                 <option value="Seguridad y Salud en el trabajo">Seguridad y Salud en el trabajo</option>
@@ -1255,7 +1256,6 @@
                                 <option value="Autonomo">Autónomo</option>
                           </select>
 
-                        <label for="reportFilter"></label>
                         <select id="reportFilter" onchange="applyCombinedFilters()">
                               <option value="all">Todos los reportes</option>
                               <option value="myReports">Mis reportes creados</option>
@@ -1379,12 +1379,15 @@
                 <option value="Logística - Materias Primas">Logística - Materias Primas</option>
                 <option value="Logistica - Almacen General">Logistica - Almacen General</option>
                 <option value="Manufactura - Molino">Manufactura - Molino</option>
+                <option value="Manufactura - Pastificio">Manufactura - Pastificio</option>
+                <option value="Manufactura - Empaque">Manufactura - Empaque</option>
                 <option value="Manufactura - Pastificio A">Manufactura - Pastificio A</option>
                 <option value="Manufactura - Pastificio B">Manufactura - Pastificio B</option>
                 <option value="Manufactura - Pastificio C">Manufactura - Pastificio C</option>
                 <option value="Manufactura - Pastificio D">Manufactura - Pastificio D</option>
                 <option value="Manufactura - Pastificio Lavamoldes">Manufactura - Lavamoldes</option>
                 <option value="Manufactura - Empaque Pasta Larga">Manufactura - Empaque Pasta Larga</option>
+                <option value="Manufactura - Empaque Pasta Corta">Manufactura - Empaque Pasta Corta</option>
                 <option value="Manufactura - Empaque MQ 02">Manufactura - Empaque MQ 02</option>
                 <option value="Manufactura - Empaque MQ 03">Manufactura - Empaque MQ 03</option>
                 <option value="Manufactura - Empaque MQ 04">Manufactura - Empaque MQ 04</option>
@@ -1426,7 +1429,7 @@
             id="searchCreator"
             placeholder="Buscar por creador..."
             onkeyup="applyTarjetaFilters()"
-            style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex: 1; max-width: 145px; font-size: 11px;"
+            style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex: 1; max-width: 120px; font-size: 11px;"
         >
 
         <input
@@ -1434,7 +1437,7 @@
             id="searchNombreResponsable"
             placeholder="Nombre de responsable..."
             onkeyup="applyTarjetaFilters()"
-            style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex: 1; max-width: 145px; font-size: 11px;"
+            style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex: 1; max-width: 120px; font-size: 11px;"
         >
                     </div>
                 </div>
@@ -1819,15 +1822,15 @@
                 id="consolidadoRespoSearch"
                 placeholder="Buscar por responsable..."
                 oninput="filterConsolidadoByRespo()"
-                style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; flex: 1; max-width: 280px;"
+                style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; flex: 1; max-width: 280px; max-width: 145px; font-size: 11px;"
             />
 
                         <input
                 type="text"
                 id="consolidadoSearch"
-                placeholder="Buscar por nombre..."
+                placeholder="Buscar por creador..."
                 oninput="filterConsolidadoByName()"
-                style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; flex: 1; max-width: 280px;"
+                style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; flex: 1; max-width: 280px; max-width: 145px; font-size: 11px;"
             />
                     </div>
                 </div>
