@@ -365,6 +365,101 @@ function sendEmailToResponsable(responsableEmail, data, fotosLinks, creadorEmail
   }
 }
 
+// Función para programar el envío de correos después de 10 segundos
+function programarEnvioCorreos(fila, data, fotosLinks) {
+  try {
+    // Guardar los datos en Properties
+    PropertiesService.getScriptProperties()
+      .setProperty('EMAIL_DATA_' + fila, JSON.stringify({
+        fila: fila,
+        data: data,
+        fotosLinks: fotosLinks
+      }));
+    
+    // Crear trigger para ejecutar después de 10 segundos
+    ScriptApp.newTrigger('enviarCorreoConRetraso')
+      .timeBased()
+      .after(5000) // 10 segundos
+      .create();
+    
+    console.log(`Correo programado para fila ${fila} (en 10 segundos)`);
+    
+  } catch (error) {
+    console.error('Error al programar correo:', error);
+  }
+}
+
+function enviarCorreoConRetraso() {
+  try {
+    const properties = PropertiesService.getScriptProperties();
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(SHEETS.REPORTES_TARJETAS);
+    
+    // Buscar todas las tareas pendientes
+    const allProps = properties.getProperties();
+    
+    for (const key in allProps) {
+      if (key.startsWith('EMAIL_DATA_')) {
+        try {
+          const task = JSON.parse(allProps[key]);
+          const fila = task.fila;
+          
+          // Leer correo desde columna U (21) - que es "Correos"
+          const correoU = sheet.getRange(fila, 21).getValue();
+          
+          console.log(`📧 Correos leídos de columna U (fila ${fila}): ${correoU}`);
+          
+          // Procesar múltiples correos separados por comas
+          if (correoU && correoU.trim() !== '') {
+            const correosArray = correoU.split(',').map(email => email.trim()).filter(email => email.includes('@'));
+            
+            if (correosArray.length > 0) {
+              console.log(`📨 Enviando a ${correosArray.length} destinatarios en un solo correo:`, correosArray);
+              
+              // Crear una cadena con todos los correos para el campo "to"
+              const todosLosCorreos = correosArray.join(', ');
+              
+              // Enviar UN SOLO CORREO a todos los destinatarios
+              try {
+                sendEmailToResponsable(todosLosCorreos, task.data, task.fotosLinks, '');
+                console.log(`✅ Correo enviado a todos los destinatarios: ${todosLosCorreos}`);
+              } catch (emailError) {
+                console.error(`❌ Error enviando correo grupal:`, emailError);
+              }
+            } else {
+              console.log(`⚠️ No se encontraron correos válidos en columna U para fila ${fila}`);
+            }
+          } else {
+            console.log(`⚠️ Columna U vacía para fila ${fila}`);
+          }
+          
+          // Eliminar la tarea
+          properties.deleteProperty(key);
+          
+        } catch (err) {
+          console.error(`Error con tarea ${key}:`, err);
+        }
+      }
+    }
+    
+    // Limpiar triggers
+    limpiarTriggers();
+    
+  } catch (error) {
+    console.error('Error en enviarCorreoConRetraso:', error);
+  }
+}
+
+// Función para limpiar triggers
+function limpiarTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  for (const trigger of triggers) {
+    if (trigger.getHandlerFunction() === 'enviarCorreoConRetraso') {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  }
+}
+
 /**
  * Obtiene el email del creador basado en su nombre/cedula
  */

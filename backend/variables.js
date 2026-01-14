@@ -15,18 +15,3 @@ const SHEETS = {
   COMENTARIOS_MAQUINAS: "Reportes_Maquinas_COMENTARIOS",
   CICLOS_HISTORIAL: "Ciclos_Historial"
 };
-
-const RESPONSABLES_EMAILS = {
-  "Jefe del Area Seleccionada": "(POR MAPEAR)",
-  "Jefe Aseguramiento de Calidad": "pragestionhumana@pastascomarrico.com",
-  "Coordinador de Gestión Ambiental": "pragestionhumana@pastascomarrico.com",
-  "Coordinador de Proyectos": "pragestionhumana@pastascomarrico.com",
-  "Obras Civiles": "pragestionhumana@pastascomarrico.com",
-  "Reparaciones Metalmecanicas IMB": "pragestionhumana@pastascomarrico.com",
-  "Técnico Eléctrico": "pragestionhumana@pastascomarrico.com",
-  "Técnico Mecánico": "pragestionhumana@pastascomarrico.com",
-  "Servicios Técnicos": "pragestionhumana@pastascomarrico.com",
-
-  // Por defecto
-  "Por Asignar": "pragestionhumana@pastascomarrico.com"
-};

@@ -34,48 +34,55 @@ function submitTarjetaReport(data) {
     const totalTarjetas = sheet.getLastRow() - 1;
     const tarjetaId = `TAR-${String(totalTarjetas + 1).padStart(4, '0')}`;
 
-
-    // CORRECCIÓN: Array con todas las columnas en el orden correcto
+    // Array con TODAS las columnas en orden exacto del Sheet
     const newRow = [
-      data.zonaRiesgo || '',
-      data.nombreCedula || '',
-      data.ubicacion || '',
-      data.prioridad || '',
-      data.descripcionProblema || '',
-      data.tipoRiesgo || '',
-      data.problemaAsociado || '',
-      data.sistemaGestion || '',
-      data.responsableSolucion || '',
-      data.generadaPor || '',
-      data.fechaCreacionTarjeta || '',
-      data.estado || 'Abierta',
-      JSON.stringify(fotosLinks),
-      '',
-      '',
-      data.requiereSAP || 'No',
-      tarjetaId
+      data.zonaRiesgo || '',                    // Col A (1)
+      data.nombreCedula || '',                  // Col B (2)
+      data.ubicacion || '',                     // Col C (3)
+      data.prioridad || '',                     // Col D (4)
+      data.descripcionProblema || '',           // Col E (5)
+      data.tipoRiesgo || '',                    // Col F (6)
+      data.problemaAsociado || '',              // Col G (7)
+      data.sistemaGestion || '',                // Col H (8)
+      data.responsableSolucion || '',           // Col I (9)
+      data.generadaPor || '',                   // Col J (10)
+      data.fechaCreacionTarjeta || '',          // Col K (11)
+      data.estado || 'Abierta',                 // Col L (12)
+      JSON.stringify(fotosLinks),               // Col M (13) - fotos
+      '',                                       // Col N (14) - comentarioCierre
+      '',                                       // Col O (15) - ResponsableCierre
+      data.requiereSAP || 'No',                 // Col P (16) - RequiereSAP
+      tarjetaId,                                // Col Q (17) - tarjetaId
+      '',                                       // Col R (18) - NumSAP
+      '',                                       // Col S (19) - Responsable_Solucion_Nombre_Visualizar_Reporte
+      '',                                       // Col T (20) - Responsable_Tecnico:SAP
+      '',                                       // Col U (21) - Correos (se llena con fórmula)
+      '',                                       // Col V (22) - Correos_Seguimiento
+      '',                                       // Col W (23) - Mes
+      '',                                       // Col X (24) - Año
+      ''                                        // Col Y (25) - FechaCierreTarjeta
     ];
 
     sheet.appendRow(newRow);
-
+    
+    // Obtener el número de fila recién agregada
+    const nuevaFila = sheet.getLastRow();
     const creadorEmail = getEmailByNombre(data.nombreCedula);
-    const responsableEmail = RESPONSABLES_EMAILS[data.responsableSolucion] || RESPONSABLES_EMAILS["Por Asignar"];
 
-    // Enviar correos
     if (creadorEmail) {
       sendEmailToCreador(creadorEmail, data, fotosLinks);
     }
-
-    if (responsableEmail) {
-      sendEmailToResponsable(responsableEmail, data, fotosLinks, creadorEmail);
-    }
-
+    
+    // Programar el envío de correos después de 10 segundos
+    programarEnvioCorreos(nuevaFila, data, fotosLinks);
+    
     return {
       success: true,
       tarjetaId: tarjetaId,
       message: 'Tarjeta de anormalidad registrada exitosamente',
       fotos: fotosLinks
     };
+    
   } catch (error) {
     console.error('Error al guardar tarjeta:', error);
     return {

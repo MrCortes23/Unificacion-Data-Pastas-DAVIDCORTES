@@ -245,52 +245,262 @@ function renderN2AnioMesProcesoStats(data) {
         return;
     }
 
-    let html = '';
-    data.forEach((row, index) => {
-        const isMonthTotal = row.isMonthTotal;
-        const isYearTotal = row.isYearTotal;
-        const isGlobalTotal = row.isGlobalTotal;
-
-        let rowStyle = '';
-        let cellStyle = '';
-
-        if (isGlobalTotal) {
-            rowStyle = 'background: #1f2937; color: white; font-weight: 700;';
-            cellStyle = 'font-weight: 700;';
-        } else if (isYearTotal) {
-            rowStyle = 'background: #4b5563; color: white; font-weight: 600;';
-            cellStyle = 'font-weight: 600;';
-        } else if (isMonthTotal) {
-            rowStyle = 'background: #6b7280; color: white; font-weight: 600;';
-            cellStyle = 'font-weight: 600;';
-        } else if (index % 2 === 0) {
-            rowStyle = 'background: #f9fafb;';
+    // Separar los datos
+    const filasDetalle = [];
+    const filasTotalesMes = [];
+    const filasTotalesAnio = [];
+    const filaTotalGlobal = [];
+    
+    data.forEach(row => {
+        if (row.isGlobalTotal) {
+            filaTotalGlobal.push(row);
+        } else if (row.isYearTotal) {
+            filasTotalesAnio.push(row);
+        } else if (row.isMonthTotal) {
+            filasTotalesMes.push(row);
+        } else {
+            filasDetalle.push(row);
         }
-
-        let porcentajeColor = '#374151';
-        if (row.porcentaje) {
-            const porcentajeNum = parseFloat(row.porcentaje);
-            if (porcentajeNum >= 80) porcentajeColor = '#10b981';
-            else if (porcentajeNum >= 50) porcentajeColor = '#f59e0b';
-            else porcentajeColor = '#ef4444';
-        }
-
-        html += `
-            <tr style="${rowStyle}">
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; ${cellStyle}">${row.ano || ''}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; ${cellStyle}">${row.mes || ''}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; ${cellStyle}">${row.proceso || ''}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${cellStyle}">${row.completado || 0}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${cellStyle}">${row.enProgreso || 0}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${cellStyle}">${row.enRevision || 0}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${cellStyle}">${row.pendiente || 0}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${cellStyle}">${row.total || 0}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${cellStyle}; color: ${porcentajeColor};">${row.porcentaje || '0.00%'}</td>
-            </tr>
-        `;
     });
 
+    // Organizar datos por año
+    const datosPorAnio = {};
+    
+    filasDetalle.forEach(row => {
+        const ano = row.ano;
+        const mes = row.mes;
+        const proceso = row.proceso;
+        
+        if (!datosPorAnio[ano]) {
+            datosPorAnio[ano] = {
+                meses: {},
+                totalAnio: null
+            };
+        }
+        
+        if (!datosPorAnio[ano].meses[mes]) {
+            datosPorAnio[ano].meses[mes] = {
+                procesos: [],
+                totalMes: null
+            };
+        }
+        
+        datosPorAnio[ano].meses[mes].procesos.push(row);
+    });
+    
+    // Agregar totales de mes
+    filasTotalesMes.forEach(row => {
+        const text = row.ano || '';
+        if (text.startsWith('Total ')) {
+            const mesNombre = text.replace('Total ', '');
+            Object.keys(datosPorAnio).forEach(ano => {
+                if (datosPorAnio[ano].meses[mesNombre]) {
+                    datosPorAnio[ano].meses[mesNombre].totalMes = row;
+                }
+            });
+        }
+    });
+    
+    // Agregar totales de año
+    filasTotalesAnio.forEach(row => {
+        const text = row.ano || '';
+        if (text.startsWith('Total ')) {
+            const ano = text.replace('Total ', '');
+            if (datosPorAnio[ano]) {
+                datosPorAnio[ano].totalAnio = row;
+            }
+        }
+    });
+    
+    let html = '';
+    let anoIndex = 0;
+    
+    // Ordenar años de mayor a menor
+    const anosOrdenados = Object.keys(datosPorAnio).sort((a, b) => parseInt(b) - parseInt(a));
+    
+    anosOrdenados.forEach(ano => {
+        const anoData = datosPorAnio[ano];
+        const mesesOrdenados = Object.keys(anoData.meses).sort((a, b) => {
+            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            return meses.indexOf(a) - meses.indexOf(b);
+        });
+        
+        const totalAnio = anoData.totalAnio;
+        let porcentajeAnioColor = '#374151';
+        
+        if (totalAnio && totalAnio.porcentaje) {
+            const porcentajeNum = parseFloat(totalAnio.porcentaje);
+            if (porcentajeNum >= 80) porcentajeAnioColor = '#10b981';
+            else if (porcentajeNum >= 50) porcentajeAnioColor = '#f59e0b';
+            else porcentajeAnioColor = '#ef4444';
+        }
+        
+        // Fila del AÑO (NO expandible, con totales visibles)
+        const anoRowStyle = anoIndex % 2 === 0 ? 'background: #f3f4f6;' : 'background: #ffffff;';
+        
+        html += `
+            <tr style="${anoRowStyle}">
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 700; color: #1f2937; font-size: 15px;">
+                    <i class="fa-solid fa-calendar" style="margin-right: 10px; color: #6b7280;"></i>
+                    ${ano}
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 700;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 700;"></td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 700;">${totalAnio?.completado || 0}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 700;">${totalAnio?.enProgreso || 0}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 700;">${totalAnio?.enRevision || 0}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 700;">${totalAnio?.pendiente || 0}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 700;">${totalAnio?.total || 0}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 700; color: ${porcentajeAnioColor};">${totalAnio?.porcentaje || '0.00%'}</td>
+            </tr>
+        `;
+        
+        // Filas de meses (dentro del año)
+        mesesOrdenados.forEach((mes, mesIndex) => {
+            const mesData = anoData.meses[mes];
+            const mesRowId = `ano-${anoIndex}-mes-${mesIndex}`;
+            const totalMes = mesData.totalMes;
+            const procesosOrdenados = mesData.procesos.sort((a, b) => a.proceso.localeCompare(b.proceso));
+            
+            // Fila del MES (expandible)
+            const mesRowStyle = (anoIndex + mesIndex) % 2 === 0 ? 'background: #f9fafb;' : 'background: #ffffff;';
+            
+            let porcentajeMesColor = '#374151';
+            if (totalMes && totalMes.porcentaje) {
+                const porcentajeNum = parseFloat(totalMes.porcentaje);
+                if (porcentajeNum >= 80) porcentajeMesColor = '#10b981';
+                else if (porcentajeNum >= 50) porcentajeMesColor = '#f59e0b';
+                else porcentajeMesColor = '#ef4444';
+            }
+            
+            html += `
+                <tr style="${mesRowStyle} cursor: pointer;" onclick="toggleN2Mes('${mesRowId}')">
+                    <td style="padding: 12px 12px 12px 40px; border-bottom: 1px solid #e5e7eb;">
+                        <i id="icon-${mesRowId}" class="fa-solid fa-caret-right" style="margin-right: 10px; color: #6b7280;"></i>
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151;">
+                        ${mes}
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;"></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 700;"></td>
+                </tr>
+            `;
+            
+            // Filas de procesos (dentro del mes)
+            procesosOrdenados.forEach((procesoRow, procesoIndex) => {
+                const procesoRowStyle = (anoIndex + mesIndex + procesoIndex) % 2 === 0 ? 'background: #f9fafb;' : 'background: #ffffff;';
+                
+                let porcentajeColor = '#374151';
+                if (procesoRow.porcentaje) {
+                    const porcentajeNum = parseFloat(procesoRow.porcentaje);
+                    if (porcentajeNum >= 80) porcentajeColor = '#10b981';
+                    else if (porcentajeNum >= 50) porcentajeColor = '#f59e0b';
+                    else porcentajeColor = '#ef4444';
+                }
+                
+                html += `
+                    <tr class="detalle-${mesRowId}" style="display: none; ${procesoRowStyle}">
+                        <td style="padding: 12px 12px 12px 70px; border-bottom: 1px solid #e5e7eb;">
+                        </td>
+                        <td style="padding: 12px 12px 12px 20px; border-bottom: 1px solid #e5e7eb;"></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${procesoRow.proceso || ''}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${procesoRow.completado || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${procesoRow.enProgreso || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${procesoRow.enRevision || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${procesoRow.pendiente || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${procesoRow.total || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600; color: ${porcentajeColor};">${procesoRow.porcentaje || '0.00%'}</td>
+                    </tr>
+                `;
+            });
+            
+            // Fila de TOTAL del MES (después de los procesos)
+            if (totalMes) {
+                html += `
+                    <tr class="detalle-${mesRowId}" style="display: none; background: #f0f0f0;">
+                        <td style="padding: 12px 12px 12px 40px; border-bottom: 1px solid #d1d5db;"></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db; font-weight: 700; color: #1f2937; text-align: right;">Total ${mes}:</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db;"></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${totalMes.completado || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${totalMes.enProgreso || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${totalMes.enRevision || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${totalMes.pendiente || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700;">${totalMes.total || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #d1d5db; text-align: center; font-weight: 700; color: ${porcentajeMesColor};">${totalMes.porcentaje || '0.00%'}</td>
+                    </tr>
+                `;
+            }
+            
+            // Separador entre meses (solo cuando está expandido)
+            html += `
+                <tr class="detalle-${mesRowId}" style="display: none;">
+                </tr>
+            `;
+        });
+        
+        // Separador entre años
+        html += `
+            <tr>
+            </tr>
+        `;
+        
+        anoIndex++;
+    });
+    
+    // Fila de TOTAL GLOBAL (al final)
+    if (filaTotalGlobal.length > 0) {
+        const globalRow = filaTotalGlobal[0];
+        let porcentajeGlobalColor = '#374151';
+        if (globalRow.porcentaje) {
+            const porcentajeNum = parseFloat(globalRow.porcentaje);
+            if (porcentajeNum >= 80) porcentajeGlobalColor = '#10b981';
+            else if (porcentajeNum >= 50) porcentajeGlobalColor = '#f59e0b';
+            else porcentajeGlobalColor = '#ef4444';
+        }
+        
+        html += `
+            <tr style="background: #f8fafc; border-top: 2px solid #e5e7eb;">
+                <td style="padding: 16px; font-weight: 700; color: #1f2937; font-size: 15px;">
+                    <i class="fa-solid fa-chart-bar" style="margin-right: 10px; color: #6b7280;"></i>
+                    SUMA TOTAL
+                </td>
+                <td style="padding: 16px; font-weight: 700;"></td>
+                <td style="padding: 16px; font-weight: 700;"></td>
+                <td style="padding: 16px; text-align: center; font-weight: 700;">${globalRow.completado || 0}</td>
+                <td style="padding: 16px; text-align: center; font-weight: 700;">${globalRow.enProgreso || 0}</td>
+                <td style="padding: 16px; text-align: center; font-weight: 700;">${globalRow.enRevision || 0}</td>
+                <td style="padding: 16px; text-align: center; font-weight: 700;">${globalRow.pendiente || 0}</td>
+                <td style="padding: 16px; text-align: center; font-weight: 700;">${globalRow.total || 0}</td>
+                <td style="padding: 16px; text-align: center; font-weight: 700; color: ${porcentajeGlobalColor}; font-size: 15px;">${globalRow.porcentaje || '0.00%'}</td>
+            </tr>
+        `;
+    }
+    
     tableBody.innerHTML = html;
+}
+
+// Función para expandir/colapsar meses (versión simplificada)
+function toggleN2Mes(rowId) {
+    const icon = document.getElementById('icon-' + rowId);
+    const allRows = document.querySelectorAll('.detalle-' + rowId);
+    
+    if (icon.classList.contains('fa-caret-right')) {
+        icon.classList.remove('fa-caret-right');
+        icon.classList.add('fa-caret-down');
+        icon.style.transform = 'rotate(0deg)';
+        allRows.forEach(row => row.style.display = '');
+    } else {
+        icon.classList.add('fa-caret-right');
+        icon.classList.remove('fa-caret-down');
+        icon.style.transform = 'rotate(0deg)';
+        allRows.forEach(row => row.style.display = 'none');
+    }
 }
 
 // Tab 2: Proceso
